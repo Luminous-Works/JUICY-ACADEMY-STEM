@@ -4,3 +4,6 @@
 [submodule "Earth-Science"]
 	path = Earth-Science
 	url = https://github.com/Luminous-Works/JUICY-Earth-Science
+[submodule "Ecological-Sciences"]
+	path = Ecological-Sciences
+	url = https://github.com/Luminous-Works/JUICY-Ecological-Sciences
