@@ -1,0 +1,6 @@
+[submodule "Metallurgy-Academy"]
+	path = Metallurgy-Academy
+	url = https://github.com/Luminous-Works/JUICY-Metallurgy-Academy
+[submodule "Earth-Science"]
+	path = Earth-Science
+	url = https://github.com/Luminous-Works/JUICY-Earth-Science
