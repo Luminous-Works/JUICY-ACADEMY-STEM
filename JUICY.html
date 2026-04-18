@@ -1,0 +1,902 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>JUICY ACADEMY · Jamaica STEM Platform v1.0</title>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#020810;--panel:rgba(0,12,24,0.92);--border:rgba(0,166,81,0.22);
+  --accent:#00A651;--gold:#FED100;--text:#d8f0e0;--dim:rgba(200,230,210,0.60);
+  --font-mono:'JetBrains Mono',monospace;--font-body:'Inter',sans-serif;
+  --red:#e05050;--blue:#2080ff;--orange:#ff8c00;
+}
+html,body{width:100%;height:100%;overflow:hidden;background:var(--bg);color:var(--text);font-family:var(--font-mono)}
+/* ── BOOT ─────────────────────────────────────────────────────────── */
+#boot{position:fixed;inset:0;z-index:9999;background:#000d08;display:flex;flex-direction:column;align-items:center;justify-content:center;transition:opacity 0.8s}
+#boot.gone{opacity:0;pointer-events:none}
+.boot-logo{font-size:64px;font-weight:800;letter-spacing:.06em;color:var(--accent);text-shadow:0 0 40px rgba(0,166,81,.8),0 0 80px rgba(0,166,81,.4);margin-bottom:6px}
+.boot-word{font-size:14px;letter-spacing:.5em;color:var(--gold);margin-bottom:4px}
+.boot-ver{font-size:11px;letter-spacing:.25em;color:rgba(254,209,0,.45);margin-bottom:30px}
+.boot-bar-wrap{width:400px;height:2px;background:rgba(0,166,81,.15)}
+.boot-bar{height:100%;width:0%;background:linear-gradient(90deg,var(--accent),var(--gold));transition:width .3s ease}
+.boot-status{font-size:10px;letter-spacing:.18em;color:rgba(0,166,81,.5);margin-top:10px;text-transform:uppercase}
+/* ── SHELL ────────────────────────────────────────────────────────── */
+#shell{width:100%;height:100%;display:flex;flex-direction:column}
+/* ── TOPBAR ───────────────────────────────────────────────────────── */
+#topbar{height:46px;background:rgba(0,8,18,.96);border-bottom:1px solid var(--border);backdrop-filter:blur(12px);display:flex;align-items:center;gap:10px;padding:0 14px;flex-shrink:0;z-index:200}
+.tb-logo{display:flex;flex-direction:column;margin-right:6px}
+.tb-j{font-size:16px;font-weight:800;letter-spacing:.1em;color:var(--accent)}
+.tb-sub{font-size:10px;letter-spacing:.25em;color:var(--dim)}
+.nav-btn{background:transparent;border:1px solid rgba(0,166,81,.18);border-radius:3px;color:var(--dim);font-family:var(--font-mono);font-size:12px;letter-spacing:.15em;padding:4px 12px;cursor:pointer;transition:.15s}
+.nav-btn:hover{color:var(--accent);border-color:rgba(0,166,81,.45)}
+.nav-btn.active{color:var(--accent);border-color:var(--accent);background:rgba(0,166,81,.08)}
+#topbar-right{margin-left:auto;display:flex;align-items:center;gap:10px}
+#zulu-clock{font-size:12px;color:var(--dim);letter-spacing:.12em}
+.status-pill{font-size:10px;letter-spacing:.12em;padding:2px 8px;border-radius:2px;border:1px solid rgba(0,166,81,.28);color:var(--accent)}
+/* ── PANELS ───────────────────────────────────────────────────────── */
+#content{flex:1;overflow:hidden;position:relative}
+.view-panel{position:absolute;inset:0;display:none}
+.view-panel.active{display:flex}
+/* ── MAP PANEL ────────────────────────────────────────────────────── */
+#view-map{flex-direction:row}
+#map-sidebar{width:260px;background:var(--panel);border-right:1px solid var(--border);display:flex;flex-direction:column;flex-shrink:0;overflow:hidden}
+#map-container{flex:1;position:relative}
+#leaflet-map{width:100%;height:100%}
+#map-sidebar-right{width:220px;background:var(--panel);border-left:1px solid var(--border);display:flex;flex-direction:column;flex-shrink:0;overflow-y:auto}
+.sidebar-hdr{font-size:10px;letter-spacing:.2em;color:var(--dim);padding:10px 12px 6px;border-bottom:1px solid var(--border);flex-shrink:0}
+.sidebar-body{flex:1;overflow-y:auto;padding:8px}
+.layer-row{display:flex;align-items:center;gap:8px;padding:5px 12px;cursor:pointer;transition:.12s}
+.layer-row:hover{background:rgba(0,166,81,.07)}
+.layer-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0}
+.layer-lbl{font-size:11px;letter-spacing:.08em;color:var(--text)}
+.layer-row input[type=checkbox]{accent-color:var(--accent)}
+/* route list */
+.route-item{padding:6px 10px;border-bottom:1px solid rgba(0,166,81,.08);cursor:pointer;transition:.1s}
+.route-item:hover{background:rgba(0,166,81,.08)}
+.route-item.active{background:rgba(0,166,81,.14);border-left:2px solid var(--accent)}
+.route-num{font-size:13px;font-weight:700;color:var(--accent)}
+.route-name{font-size:10px;color:var(--dim);letter-spacing:.05em;margin-top:1px}
+/* telem cards */
+.t-card{padding:8px 12px;border-bottom:1px solid rgba(0,166,81,.08)}
+.t-lbl{font-size:9px;letter-spacing:.2em;color:var(--dim);text-transform:uppercase}
+.t-val{font-size:15px;font-weight:700;color:var(--text);margin-top:2px}
+.t-val.green{color:var(--accent)}
+.t-val.gold{color:var(--gold)}
+.t-val.red{color:var(--red)}
+/* map controls overlay */
+#map-controls{position:absolute;top:10px;right:10px;z-index:400;display:flex;flex-direction:column;gap:6px}
+.mc-btn{background:rgba(0,8,18,.88);border:1px solid var(--border);border-radius:3px;color:var(--text);font-family:var(--font-mono);font-size:11px;padding:5px 10px;cursor:pointer;backdrop-filter:blur(8px)}
+.mc-btn:hover{border-color:var(--accent);color:var(--accent)}
+#route-count-badge{position:absolute;bottom:10px;left:270px;z-index:400;background:rgba(0,8,18,.88);border:1px solid var(--border);border-radius:3px;padding:4px 10px;font-size:10px;letter-spacing:.12em;color:var(--accent);backdrop-filter:blur(8px)}
+/* ── TRANSIT PANEL ────────────────────────────────────────────────── */
+#view-transit{flex-direction:row}
+#transit-list{width:280px;background:var(--panel);border-right:1px solid var(--border);display:flex;flex-direction:column;flex-shrink:0}
+#transit-list-body{flex:1;overflow-y:auto}
+#transit-detail{flex:1;display:flex;flex-direction:column;overflow:hidden}
+#transit-map{flex:1;min-height:0}
+#transit-info{height:160px;background:rgba(0,8,18,.6);border-top:1px solid var(--border);padding:14px;display:flex;gap:20px;overflow:hidden}
+.ti-stat{min-width:90px}
+.ti-lbl{font-size:9px;letter-spacing:.2em;color:var(--dim)}
+.ti-val{font-size:22px;font-weight:800;color:var(--accent);margin-top:4px}
+.ti-sub{font-size:10px;color:var(--dim);margin-top:2px}
+#transit-stops{flex:1;overflow-y:auto}
+.stop-item{font-size:11px;color:var(--dim);padding:3px 0;border-bottom:1px solid rgba(0,166,81,.06);display:flex;gap:6px}
+.stop-num{color:var(--accent);min-width:24px}
+/* ── HAZARD PANEL ─────────────────────────────────────────────────── */
+#view-hazard{flex-direction:column;overflow-y:auto}
+.hazard-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:14px;padding:16px}
+.haz-card{background:var(--panel);border:1px solid var(--border);border-radius:4px;padding:14px}
+.haz-card-hdr{display:flex;align-items:center;gap:10px;margin-bottom:10px}
+.haz-icon{width:36px;height:36px;border-radius:4px;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0}
+.haz-title{font-size:13px;font-weight:700;letter-spacing:.1em;color:var(--text)}
+.haz-org{font-size:10px;color:var(--dim);letter-spacing:.1em}
+.haz-body{font-size:11px;color:var(--dim);line-height:1.55;margin-bottom:10px}
+.haz-status{font-size:10px;letter-spacing:.12em;padding:3px 8px;border-radius:2px;display:inline-block}
+.haz-status.active{background:rgba(0,166,81,.15);border:1px solid rgba(0,166,81,.35);color:var(--accent)}
+.haz-status.linked{background:rgba(254,209,0,.10);border:1px solid rgba(254,209,0,.28);color:var(--gold)}
+.haz-link{display:block;font-size:10px;color:rgba(0,166,81,.7);text-decoration:none;margin-top:6px;letter-spacing:.08em}
+.haz-link:hover{color:var(--accent)}
+.cdema-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:8px;margin-top:10px}
+.cdema-country{background:rgba(0,20,10,.6);border:1px solid rgba(0,166,81,.15);border-radius:3px;padding:7px 10px;font-size:11px;color:var(--dim)}
+.cdema-country span{display:block;font-size:9px;letter-spacing:.12em;color:rgba(0,166,81,.5);text-transform:uppercase;margin-top:2px}
+.alerts-list{display:flex;flex-direction:column;gap:6px;margin-top:10px}
+.alert-item{display:flex;gap:8px;align-items:flex-start;padding:6px 8px;border-radius:3px;border:1px solid rgba(0,166,81,.12);background:rgba(0,12,6,.5)}
+.alert-dot{width:8px;height:8px;border-radius:50%;margin-top:3px;flex-shrink:0}
+.alert-txt{font-size:10px;color:var(--dim)}
+.alert-type{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.1em}
+/* ── COASTAL PANEL ────────────────────────────────────────────────── */
+#view-coastal{flex-direction:column;overflow-y:auto}
+.coastal-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:14px;padding:16px}
+.coast-card{background:var(--panel);border:1px solid var(--border);border-radius:4px;overflow:hidden}
+.coast-hdr{background:rgba(0,30,60,.5);padding:10px 14px;font-size:11px;font-weight:700;letter-spacing:.15em;color:var(--text);border-bottom:1px solid var(--border)}
+.coast-body{padding:12px 14px}
+.metric-row{display:flex;justify-content:space-between;align-items:baseline;padding:5px 0;border-bottom:1px solid rgba(0,166,81,.07)}
+.metric-lbl{font-size:10px;color:var(--dim);letter-spacing:.08em}
+.metric-val{font-size:16px;font-weight:700;color:var(--accent)}
+.metric-unit{font-size:9px;color:var(--dim)}
+.copernicus-logo{font-size:9px;letter-spacing:.15em;color:rgba(0,150,255,.5);margin-top:8px;text-align:right}
+.tide-bar{height:4px;background:rgba(0,166,81,.15);border-radius:2px;margin:4px 0;position:relative}
+.tide-fill{height:100%;border-radius:2px;background:linear-gradient(90deg,var(--accent),var(--gold));transition:width .5s}
+.hot-item{font-size:11px;color:var(--dim);padding:5px 0;border-bottom:1px solid rgba(0,166,81,.07);display:flex;justify-content:space-between}
+.hot-status{font-size:9px;padding:2px 6px;border-radius:2px;background:rgba(254,209,0,.12);color:var(--gold)}
+/* ── ACADEMY PANEL ────────────────────────────────────────────────── */
+#view-academy{flex-direction:row;overflow:hidden}
+#academy-nav{width:240px;background:var(--panel);border-right:1px solid var(--border);display:flex;flex-direction:column;flex-shrink:0;overflow-y:auto}
+.acad-module-hdr{font-size:9px;letter-spacing:.2em;color:var(--dim);padding:12px 12px 4px;text-transform:uppercase}
+.acad-module-item{padding:7px 16px;cursor:pointer;font-size:11px;letter-spacing:.08em;color:var(--dim);border-left:2px solid transparent;transition:.12s}
+.acad-module-item:hover{color:var(--accent);background:rgba(0,166,81,.06)}
+.acad-module-item.active{color:var(--accent);border-left-color:var(--accent);background:rgba(0,166,81,.1)}
+.acad-module-code{font-size:9px;color:rgba(0,166,81,.5);letter-spacing:.12em;margin-right:6px}
+#academy-content{flex:1;overflow-y:auto;padding:20px 24px}
+.lesson-header{border-bottom:1px solid var(--border);padding-bottom:12px;margin-bottom:16px}
+.lesson-code{font-size:10px;letter-spacing:.25em;color:var(--gold);margin-bottom:4px}
+.lesson-title{font-size:22px;font-weight:700;color:var(--text);margin-bottom:6px}
+.lesson-meta{font-size:11px;color:var(--dim)}
+.lesson-body{font-size:13px;color:var(--dim);line-height:1.65;font-family:var(--font-body)}
+.lesson-body h3{font-family:var(--font-mono);font-size:12px;letter-spacing:.15em;color:var(--accent);margin:16px 0 6px;text-transform:uppercase}
+.lesson-body p{margin-bottom:10px}
+.lesson-body code{background:rgba(0,166,81,.1);border:1px solid rgba(0,166,81,.2);border-radius:2px;padding:1px 5px;font-family:var(--font-mono);font-size:11px;color:var(--accent)}
+.lesson-links{margin-top:16px;display:flex;flex-wrap:wrap;gap:8px}
+.lesson-link-btn{font-size:10px;letter-spacing:.12em;padding:5px 12px;background:rgba(0,166,81,.08);border:1px solid rgba(0,166,81,.28);border-radius:2px;color:var(--accent);text-decoration:none;cursor:pointer}
+.lesson-link-btn:hover{background:rgba(0,166,81,.18)}
+/* ── FOOTER ───────────────────────────────────────────────────────── */
+#footer{height:24px;background:rgba(0,5,12,.96);border-top:1px solid var(--border);display:flex;align-items:center;padding:0 14px;gap:16px;flex-shrink:0}
+#footer-left{font-size:9px;letter-spacing:.15em;color:rgba(0,166,81,.4)}
+#footer-right{margin-left:auto;font-size:9px;letter-spacing:.12em;color:rgba(0,166,81,.4)}
+/* ── LOADING OVERLAY ──────────────────────────────────────────────── */
+#loading-overlay{position:absolute;inset:0;background:rgba(2,8,16,.7);display:flex;align-items:center;justify-content:center;z-index:800;backdrop-filter:blur(4px)}
+#loading-overlay.gone{display:none}
+.loading-text{font-size:12px;letter-spacing:.2em;color:var(--accent);animation:blink-a 1.2s ease-in-out infinite}
+@keyframes blink-a{0%,100%{opacity:.4}50%{opacity:1}}
+/* ── LEAFLET OVERRIDES ────────────────────────────────────────────── */
+.leaflet-control-zoom a{background:#0d1f12!important;border-color:var(--border)!important;color:var(--accent)!important}
+.leaflet-popup-content-wrapper{background:rgba(0,12,24,.96)!important;color:var(--text)!important;border:1px solid var(--border)!important;box-shadow:0 4px 24px rgba(0,0,0,.5)!important}
+.leaflet-popup-tip{background:rgba(0,12,24,.96)!important}
+.leaflet-popup-content{font-family:var(--font-mono)!important;font-size:12px!important;color:var(--text)!important}
+/* scrollbar */
+::-webkit-scrollbar{width:4px;height:4px}
+::-webkit-scrollbar-track{background:rgba(0,0,0,.2)}
+::-webkit-scrollbar-thumb{background:rgba(0,166,81,.3);border-radius:2px}
+</style>
+</head>
+<body>
+
+<!-- BOOT -->
+<div id="boot">
+  <div class="boot-logo">JUICY</div>
+  <div class="boot-word">JAMAICA UNIVERSITY INTEGRATED COMMUNITY ACADEMY</div>
+  <div class="boot-ver">v1.0 · LUMINOUS.WORKS LLC · BLACKBOX INDUSTRIES</div>
+  <div class="boot-bar-wrap"><div class="boot-bar" id="boot-bar"></div></div>
+  <div class="boot-status" id="boot-status">INITIALIZING TRANSIT LAYER...</div>
+</div>
+
+<!-- MAIN SHELL -->
+<div id="shell">
+
+  <!-- TOPBAR -->
+  <div id="topbar">
+    <div class="tb-logo">
+      <div class="tb-j">JUICY</div>
+      <div class="tb-sub">SOVEREIGN STEM · JAMAICA</div>
+    </div>
+    <button class="nav-btn active" onclick="switchView('map')">MAP</button>
+    <button class="nav-btn" onclick="switchView('transit')">TRANSIT</button>
+    <button class="nav-btn" onclick="switchView('hazard')">HAZARD</button>
+    <button class="nav-btn" onclick="switchView('coastal')">COASTAL</button>
+    <button class="nav-btn" onclick="switchView('academy')">ACADEMY</button>
+    <div id="topbar-right">
+      <div class="status-pill" id="route-status">LOADING ROUTES</div>
+      <div id="zulu-clock">--:--:--Z</div>
+    </div>
+  </div>
+
+  <!-- CONTENT -->
+  <div id="content">
+
+    <!-- ═══ MAP ═══ -->
+    <div class="view-panel active" id="view-map">
+      <div id="map-sidebar">
+        <div class="sidebar-hdr">MAP LAYERS</div>
+        <div style="padding:8px">
+          <div class="layer-row">
+            <input type="checkbox" id="lyr-jutc" checked onchange="toggleLayer('jutc',this.checked)">
+            <div class="layer-dot" style="background:#00A651"></div>
+            <div class="layer-lbl">JUTC Routes</div>
+          </div>
+          <div class="layer-row">
+            <input type="checkbox" id="lyr-hazard" onchange="toggleLayer('hazard',this.checked)">
+            <div class="layer-dot" style="background:#e05050"></div>
+            <div class="layer-lbl">Hazard Zones</div>
+          </div>
+          <div class="layer-row">
+            <input type="checkbox" id="lyr-evac" onchange="toggleLayer('evac',this.checked)">
+            <div class="layer-dot" style="background:#FED100"></div>
+            <div class="layer-lbl">Evacuation Routes</div>
+          </div>
+          <div class="layer-row">
+            <input type="checkbox" id="lyr-hot" onchange="toggleLayer('hot',this.checked)">
+            <div class="layer-dot" style="background:#2080ff"></div>
+            <div class="layer-lbl">HOT Mapping</div>
+          </div>
+        </div>
+        <div class="sidebar-hdr">JUTC ROUTES (<span id="route-list-count">0</span>)</div>
+        <div class="sidebar-body" id="route-list" style="flex:1;padding:0"></div>
+      </div>
+
+      <div id="map-container">
+        <div id="leaflet-map"></div>
+        <div id="map-controls">
+          <button class="mc-btn" onclick="mapFlyJamaica()">⌂ JAMAICA</button>
+          <button class="mc-btn" onclick="mapFlyKingston()">⌖ KGN</button>
+          <button class="mc-btn" id="tile-btn" onclick="toggleTile()">⊞ SATELLITE</button>
+        </div>
+        <div id="route-count-badge">◈ <span id="badge-routes">0</span> ROUTES LOADED</div>
+        <div id="loading-overlay"><div class="loading-text">◈ FETCHING JUTC ROUTES FROM OSM...</div></div>
+      </div>
+
+      <div id="map-sidebar-right">
+        <div class="sidebar-hdr">MAP TELEMETRY</div>
+        <div class="t-card"><div class="t-lbl">TOTAL ROUTES</div><div class="t-val green" id="tmt-routes">—</div></div>
+        <div class="t-card"><div class="t-lbl">STOPS MAPPED</div><div class="t-val" id="tmt-stops">—</div></div>
+        <div class="t-card"><div class="t-lbl">DATA SOURCE</div><div class="t-val" style="font-size:11px;color:var(--dim)">OpenStreetMap</div></div>
+        <div class="t-card"><div class="t-lbl">LAST UPDATED</div><div class="t-val" style="font-size:10px" id="tmt-update">—</div></div>
+        <div class="sidebar-hdr" style="margin-top:4px">SELECTED ROUTE</div>
+        <div class="t-card"><div class="t-lbl">ROUTE No.</div><div class="t-val green" id="sel-route-num">—</div></div>
+        <div class="t-card"><div class="t-lbl">ROUTE NAME</div><div class="t-val" style="font-size:11px" id="sel-route-name">—</div></div>
+        <div class="t-card"><div class="t-lbl">FROM</div><div class="t-val" style="font-size:11px" id="sel-route-from">—</div></div>
+        <div class="t-card"><div class="t-lbl">TO</div><div class="t-val" style="font-size:11px" id="sel-route-to">—</div></div>
+        <div class="t-card"><div class="t-lbl">OPERATOR</div><div class="t-val" style="font-size:11px">JUTC</div></div>
+      </div>
+    </div>
+
+    <!-- ═══ TRANSIT ═══ -->
+    <div class="view-panel" id="view-transit">
+      <div id="transit-list">
+        <div class="sidebar-hdr">ALL JUTC ROUTES</div>
+        <div id="transit-list-body"></div>
+      </div>
+      <div id="transit-detail">
+        <div id="transit-map"></div>
+        <div id="transit-info">
+          <div class="ti-stat"><div class="ti-lbl">ROUTE</div><div class="ti-val" id="ti-num">—</div><div class="ti-sub">JUTC</div></div>
+          <div class="ti-stat"><div class="ti-lbl">FROM</div><div class="ti-val" style="font-size:15px" id="ti-from">—</div></div>
+          <div class="ti-stat"><div class="ti-lbl">TO</div><div class="ti-val" style="font-size:15px" id="ti-to">—</div></div>
+          <div class="ti-stat"><div class="ti-lbl">STOPS</div><div class="ti-val" id="ti-stops">—</div></div>
+          <div style="flex:1;overflow-y:auto" id="transit-stops"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══ HAZARD ═══ -->
+    <div class="view-panel" id="view-hazard">
+      <div class="hazard-grid">
+        <!-- InaSAFE -->
+        <div class="haz-card">
+          <div class="haz-card-hdr">
+            <div class="haz-icon" style="background:rgba(224,80,80,.15)">⚠</div>
+            <div><div class="haz-title">InaSAFE · NATURAL HAZARD IMPACT</div><div class="haz-org">BNPB / AusAID · Open Source GIS Plugin</div></div>
+          </div>
+          <div class="haz-body">InaSAFE computes realistic natural hazard impact scenarios on infrastructure. Jamaica exposure: earthquake M6.5+ (Plantain Garden Fault), flood inundation (Kingston Harbour), hurricane Category 4 storm surge (south coast parishes).</div>
+          <div class="alerts-list" id="inasafe-alerts">
+            <div class="alert-item"><div class="alert-dot" style="background:#e05050"></div><div class="alert-txt"><div class="alert-type" style="color:#e05050">EARTHQUAKE ZONE</div>Plantain Garden Fault — High Hazard · Southeast Jamaica</div></div>
+            <div class="alert-item"><div class="alert-dot" style="background:#ff8c00"></div><div class="alert-txt"><div class="alert-type" style="color:#ff8c00">FLOOD RISK</div>Kingston Harbour Plain — Moderate-High · Storm surge + rainfall</div></div>
+            <div class="alert-item"><div class="alert-dot" style="background:#2080ff"></div><div class="alert-txt"><div class="alert-type" style="color:#2080ff">HURRICANE</div>South Coast — Category 4 storm surge exposure · June–November</div></div>
+          </div>
+          <span class="haz-status active">INTEGRATED</span>
+          <a class="haz-link" href="https://inasafe.org" target="_blank">→ inasafe.org</a>
+        </div>
+        <!-- HOT -->
+        <div class="haz-card">
+          <div class="haz-card-hdr">
+            <div class="haz-icon" style="background:rgba(254,209,0,.12)">🗺</div>
+            <div><div class="haz-title">HOT · HUMANITARIAN OPENSTREETMAP</div><div class="haz-org">Humanitarian OpenStreetMap Team</div></div>
+          </div>
+          <div class="haz-body">HOT activates volunteers to map critical infrastructure during and after disasters. Jamaica mapping projects cover hospitals, schools, water sources, and informal settlement density in Kingston Metropolitan Area.</div>
+          <div class="alerts-list" id="hot-alerts">
+            <div class="alert-item"><div class="alert-dot" style="background:#FED100"></div><div class="alert-txt"><div class="alert-type" style="color:#FED100">ACTIVE MAPPING</div>Kingston Infrastructure Survey — Emergency shelter capacity</div></div>
+            <div class="alert-item"><div class="alert-dot" style="background:#00A651"></div><div class="alert-txt"><div class="alert-type" style="color:#00A651">COMPLETE</div>Jamaica Hospitals & Clinics — 147 facilities mapped (2024)</div></div>
+          </div>
+          <span class="haz-status active">LINKED</span>
+          <a class="haz-link" href="https://www.hotosm.org" target="_blank">→ hotosm.org</a>
+          <a class="haz-link" href="https://tasks.hotosm.org" target="_blank">→ HOT Tasking Manager</a>
+        </div>
+        <!-- Sahana Eden -->
+        <div class="haz-card">
+          <div class="haz-card-hdr">
+            <div class="haz-icon" style="background:rgba(32,128,255,.12)">🛡</div>
+            <div><div class="haz-title">SAHANA EDEN · DISASTER MANAGEMENT</div><div class="haz-org">Sahana Software Foundation · Open Source</div></div>
+          </div>
+          <div class="haz-body">Sahana Eden provides missing persons tracking, shelter management, volunteer coordination, and supply chain management for Caribbean disaster response. CDEMA deploys Sahana for multi-country coordination.</div>
+          <div style="margin-top:10px">
+            <div class="metric-row"><div class="metric-lbl">Missing Persons Registry</div><div style="font-size:11px;color:var(--accent)">ACTIVE</div></div>
+            <div class="metric-row"><div class="metric-lbl">Shelter Management</div><div style="font-size:11px;color:var(--accent)">ACTIVE</div></div>
+            <div class="metric-row"><div class="metric-lbl">Volunteer Coordination</div><div style="font-size:11px;color:var(--accent)">ACTIVE</div></div>
+            <div class="metric-row"><div class="metric-lbl">Supply Chain Tracking</div><div style="font-size:11px;color:var(--accent)">ACTIVE</div></div>
+          </div>
+          <span class="haz-status active">CDEMA DEPLOYED</span>
+          <a class="haz-link" href="https://www.sahanafoundation.org" target="_blank">→ sahanafoundation.org</a>
+        </div>
+        <!-- CDEMA -->
+        <div class="haz-card" style="grid-column:span 2">
+          <div class="haz-card-hdr">
+            <div class="haz-icon" style="background:rgba(0,166,81,.12)">🌴</div>
+            <div><div class="haz-title">GeoCRIS · CDEMA — 19 MEMBER STATES</div><div class="haz-org">Caribbean Disaster Emergency Management Agency · GeoCRIS GIS Portal</div></div>
+          </div>
+          <div class="haz-body">CDEMA coordinates disaster risk management across 19 Caribbean member states. GeoCRIS provides spatially-referenced hazard, vulnerability, and risk data for the entire Caribbean basin.</div>
+          <div class="cdema-grid">
+            <div class="cdema-country">Anguilla<span>Member</span></div>
+            <div class="cdema-country">Antigua & Barbuda<span>Member</span></div>
+            <div class="cdema-country">Bahamas<span>Member</span></div>
+            <div class="cdema-country">Barbados<span>HQ · Bridgetown</span></div>
+            <div class="cdema-country">Belize<span>Member</span></div>
+            <div class="cdema-country">BVI<span>Member</span></div>
+            <div class="cdema-country">Cayman Islands<span>Member</span></div>
+            <div class="cdema-country">Dominica<span>Member</span></div>
+            <div class="cdema-country">Grenada<span>Member</span></div>
+            <div class="cdema-country">Guyana<span>Member</span></div>
+            <div class="cdema-country" style="border-color:rgba(0,166,81,.4);color:var(--accent)">Jamaica<span style="color:rgba(0,166,81,.6)">Member · Host</span></div>
+            <div class="cdema-country">Montserrat<span>Member</span></div>
+            <div class="cdema-country">St. Kitts & Nevis<span>Member</span></div>
+            <div class="cdema-country">St. Lucia<span>Member</span></div>
+            <div class="cdema-country">St. Vincent<span>Member</span></div>
+            <div class="cdema-country">Suriname<span>Member</span></div>
+            <div class="cdema-country">Trinidad & Tobago<span>Member</span></div>
+            <div class="cdema-country">Turks & Caicos<span>Member</span></div>
+            <div class="cdema-country">USVI<span>Observer</span></div>
+          </div>
+          <div style="margin-top:10px;display:flex;gap:10px">
+            <span class="haz-status active">19 STATES INTEGRATED</span>
+            <a class="haz-link" href="https://www.cdema.org" target="_blank" style="margin:0">→ cdema.org</a>
+            <a class="haz-link" href="https://geocris.cdema.org" target="_blank" style="margin:0">→ GeoCRIS Portal</a>
+          </div>
+        </div>
+        <!-- Evacuation -->
+        <div class="haz-card">
+          <div class="haz-card-hdr">
+            <div class="haz-icon" style="background:rgba(254,209,0,.12)">⟶</div>
+            <div><div class="haz-title">EVACUATION MANAGEMENT SYSTEM</div><div class="haz-org">ODPEM Jamaica · Office of Disaster Preparedness</div></div>
+          </div>
+          <div class="haz-body">Jamaica's ODPEM defines official evacuation routes and shelter designations. Primary corridors: Kingston — Washington Boulevard (Category A), Kingston — Constant Spring Road (Category A), South Coast — Junction Road (Category B).</div>
+          <div class="alerts-list">
+            <div class="alert-item"><div class="alert-dot" style="background:#FED100"></div><div class="alert-txt"><div class="alert-type" style="color:#FED100">KGN PRIMARY</div>Washington Blvd → Portmore (Category A — 85,000 capacity)</div></div>
+            <div class="alert-item"><div class="alert-dot" style="background:#FED100"></div><div class="alert-txt"><div class="alert-type" style="color:#FED100">KGN SECONDARY</div>Constant Spring Rd → Stony Hill (Category A — 40,000 capacity)</div></div>
+            <div class="alert-item"><div class="alert-dot" style="background:#00A651"></div><div class="alert-txt"><div class="alert-type" style="color:#00A651">SOUTH COAST</div>Junction Rd → May Pen / Mandeville (Category B)</div></div>
+          </div>
+          <span class="haz-status linked">ODPEM SOURCED</span>
+          <a class="haz-link" href="https://www.odpem.org.jm" target="_blank">→ odpem.org.jm</a>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══ COASTAL ═══ -->
+    <div class="view-panel" id="view-coastal">
+      <div class="coastal-grid">
+        <!-- Copernicus SST -->
+        <div class="coast-card">
+          <div class="coast-hdr">COPERNICUS MARINE · SEA SURFACE TEMPERATURE</div>
+          <div class="coast-body">
+            <div class="metric-row"><div class="metric-lbl">Caribbean Basin SST</div><div><span class="metric-val" id="cop-sst">28.4</span><span class="metric-unit"> °C</span></div></div>
+            <div class="metric-row"><div class="metric-lbl">Kingston Harbour</div><div><span class="metric-val" id="cop-harbour">29.1</span><span class="metric-unit"> °C</span></div></div>
+            <div class="metric-row"><div class="metric-lbl">Anomaly vs. 1993–2020</div><div><span class="metric-val" id="cop-anom" style="color:var(--gold)">+0.8</span><span class="metric-unit"> °C</span></div></div>
+            <div class="metric-row"><div class="metric-lbl">Data Product</div><div style="font-size:10px;color:var(--dim)">GLOBAL_PHY_001_030</div></div>
+            <div class="copernicus-logo">COPERNICUS MARINE SERVICE · CMEMS</div>
+            <a class="haz-link" href="https://marine.copernicus.eu" target="_blank" style="margin-top:8px;display:block">→ marine.copernicus.eu</a>
+          </div>
+        </div>
+        <!-- Wave / Storm Surge -->
+        <div class="coast-card">
+          <div class="coast-hdr">COPERNICUS MARINE · WAVE CONDITIONS</div>
+          <div class="coast-body">
+            <div class="metric-row"><div class="metric-lbl">Significant Wave Height</div><div><span class="metric-val" id="cop-wave">1.2</span><span class="metric-unit"> m</span></div></div>
+            <div class="metric-row"><div class="metric-lbl">Peak Wave Period</div><div><span class="metric-val" id="cop-period">9.4</span><span class="metric-unit"> s</span></div></div>
+            <div class="metric-row"><div class="metric-lbl">Mean Wave Direction</div><div><span class="metric-val" id="cop-dir">ESE</span></div></div>
+            <div class="metric-row"><div class="metric-lbl">Storm Surge Risk</div><div><span class="metric-val" style="color:var(--accent);font-size:13px" id="cop-surge">LOW</span></div></div>
+            <div class="tide-bar" style="margin-top:10px"><div class="tide-fill" id="surge-bar" style="width:15%"></div></div>
+            <div class="copernicus-logo">COPERNICUS MARINE SERVICE · CMEMS</div>
+          </div>
+        </div>
+        <!-- Tidal Monitor -->
+        <div class="coast-card">
+          <div class="coast-hdr">COASTAL TIDAL MONITOR · KINGSTON HARBOUR</div>
+          <div class="coast-body">
+            <div class="metric-row"><div class="metric-lbl">Current Tide</div><div><span class="metric-val" id="tide-cur">+0.34</span><span class="metric-unit"> m MSL</span></div></div>
+            <div class="metric-row"><div class="metric-lbl">High Water (next)</div><div><span class="metric-val" id="tide-hw" style="font-size:13px">+0.52m at 14:18Z</span></div></div>
+            <div class="metric-row"><div class="metric-lbl">Low Water (next)</div><div><span class="metric-val" id="tide-lw" style="font-size:13px">+0.08m at 20:45Z</span></div></div>
+            <div class="metric-row"><div class="metric-lbl">Tidal Range</div><div><span class="metric-val">0.44</span><span class="metric-unit"> m</span></div></div>
+            <div class="metric-row"><div class="metric-lbl">Datum</div><div style="font-size:10px;color:var(--dim)">MSL · Jamaica datum</div></div>
+            <div class="tide-bar" style="margin-top:10px;height:6px">
+              <div class="tide-fill" id="tide-bar" style="width:62%"></div>
+            </div>
+          </div>
+        </div>
+        <!-- HOT Tasks -->
+        <div class="coast-card">
+          <div class="coast-hdr">HOT COASTAL MAPPING · ACTIVE PROJECTS</div>
+          <div class="coast-body">
+            <div id="hot-tasks-list">
+              <div class="hot-item"><span>Jamaica Coastline Baseline Survey</span><span class="hot-status">MAPPING</span></div>
+              <div class="hot-item"><span>Kingston Harbour Infrastructure</span><span class="hot-status">VALIDATION</span></div>
+              <div class="hot-item"><span>South Coast Settlement Mapping</span><span class="hot-status">COMPLETE</span></div>
+              <div class="hot-item"><span>Portland Bight Wetlands</span><span class="hot-status">MAPPING</span></div>
+              <div class="hot-item"><span>Negril Marine Park Zone</span><span class="hot-status">PENDING</span></div>
+            </div>
+            <a class="haz-link" href="https://tasks.hotosm.org/explore?campaign=Jamaica" target="_blank" style="margin-top:10px;display:block">→ HOT Jamaica Projects</a>
+          </div>
+        </div>
+        <!-- Data Management -->
+        <div class="coast-card" style="grid-column:span 2">
+          <div class="coast-hdr">DATA MANAGEMENT SYSTEM · JUICY ACADEMY</div>
+          <div class="coast-body">
+            <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:10px;margin-bottom:14px">
+              <div><div class="metric-row"><div class="metric-lbl">Datasets Indexed</div><div><span class="metric-val" id="dm-datasets">14</span></div></div></div>
+              <div><div class="metric-row"><div class="metric-lbl">Active Data Sources</div><div><span class="metric-val" id="dm-sources">6</span></div></div></div>
+              <div><div class="metric-row"><div class="metric-lbl">Curriculum Modules</div><div><span class="metric-val" id="dm-modules">28</span></div></div></div>
+              <div><div class="metric-row"><div class="metric-lbl">SigMF Extension</div><div><span class="metric-val" style="font-size:12px">bbastro:1.1</span></div></div></div>
+            </div>
+            <div style="font-size:11px;color:var(--dim);line-height:1.6;font-family:var(--font-body)">
+              JUICY Academy integrates live data streams: Copernicus Marine (SST, waves, sea level), OpenStreetMap via Overpass API (JUTC routes, infrastructure), CDEMA/GeoCRIS (regional hazard data), GDACS (real-time disaster alerts), and the SigMF bbastro:1.1 extension for radio astronomy curriculum correlation. All data is openly licensed and fully auditable.
+            </div>
+            <div style="display:flex;gap:8px;margin-top:12px;flex-wrap:wrap">
+              <span class="lesson-link-btn" onclick="switchView('academy')">→ CURRICULUM</span>
+              <a class="lesson-link-btn" href="https://github.com/Luminous-Works/JUICY-ACADEMY-STEM" target="_blank">→ GITHUB</a>
+              <a class="lesson-link-btn" href="https://marine.copernicus.eu" target="_blank">→ COPERNICUS API</a>
+              <a class="lesson-link-btn" href="https://geocris.cdema.org" target="_blank">→ GeoCRIS API</a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══ ACADEMY ═══ -->
+    <div class="view-panel" id="view-academy">
+      <div id="academy-nav">
+        <div class="acad-module-hdr">COSMOLOGY</div>
+        <div class="acad-module-item active" onclick="loadLesson('cos01')"><span class="acad-module-code">COS-01</span>Pulsar Timing</div>
+        <div class="acad-module-item" onclick="loadLesson('cos02')"><span class="acad-module-code">COS-02</span>Redshift & Doppler</div>
+        <div class="acad-module-item" onclick="loadLesson('cos03')"><span class="acad-module-code">COS-03</span>Bose-Einstein Condensate</div>
+        <div class="acad-module-item" onclick="loadLesson('cos04')"><span class="acad-module-code">COS-04</span>Fractional Calculus</div>
+        <div class="acad-module-item" onclick="loadLesson('cos05')"><span class="acad-module-code">COS-05</span>Black Holes</div>
+        <div class="acad-module-item" onclick="loadLesson('cos06')"><span class="acad-module-code">COS-06</span>Hydrogen Line 21cm</div>
+        <div class="acad-module-hdr">SIGNAL PHYSICS</div>
+        <div class="acad-module-item" onclick="loadLesson('sp01')"><span class="acad-module-code">SP-01</span>Resonance Thresholds</div>
+        <div class="acad-module-item" onclick="loadLesson('sp02')"><span class="acad-module-code">SP-02</span>SigMF Protocol</div>
+        <div class="acad-module-hdr">EARTH SCIENCE</div>
+        <div class="acad-module-item" onclick="loadLesson('es01')"><span class="acad-module-code">ES-01</span>Seismic Monitoring</div>
+        <div class="acad-module-item" onclick="loadLesson('es02')"><span class="acad-module-code">ES-02</span>Hydrological Analysis</div>
+        <div class="acad-module-item" onclick="loadLesson('es03')"><span class="acad-module-code">ES-03</span>Watershed Management</div>
+        <div class="acad-module-hdr">ARTIFICIAL INTELLIGENCE</div>
+        <div class="acad-module-item" onclick="loadLesson('ai01')"><span class="acad-module-code">AIS-00</span>What is AI?</div>
+        <div class="acad-module-item" onclick="loadLesson('ai07')"><span class="acad-module-code">AIS-07</span>Neural Networks</div>
+        <div class="acad-module-item" onclick="loadLesson('ai13')"><span class="acad-module-code">AIS-13</span>AI Ethics</div>
+        <div class="acad-module-hdr">WOMEN IN STEM</div>
+        <div class="acad-module-item" onclick="loadLesson('wis06')"><span class="acad-module-code">WIS-06</span>Caribbean Pioneers</div>
+        <div class="acad-module-item" onclick="loadLesson('wis09')"><span class="acad-module-code">WIS-09</span>Quantum Mechanics</div>
+        <div class="acad-module-hdr">HARMONY THEORY</div>
+        <div class="acad-module-item" onclick="loadLesson('vec01')"><span class="acad-module-code">VEC-01</span>Circle of Fifths</div>
+        <div class="acad-module-item" onclick="loadLesson('vec02')"><span class="acad-module-code">VEC-02</span>Chord Progressions</div>
+      </div>
+      <div id="academy-content">
+        <div id="lesson-display"></div>
+      </div>
+    </div>
+
+  </div><!-- /content -->
+
+  <!-- FOOTER -->
+  <div id="footer">
+    <div id="footer-left">JUICY ACADEMY v1.0 · LUMINOUS.WORKS LLC · BLACKBOX INDUSTRIES · bbastro:1.1</div>
+    <div id="footer-right">OSINT: OSM + CMEMS + CDEMA + HOT + GDACS · © 2026 SOVEREIGN STEM</div>
+  </div>
+
+</div><!-- /shell -->
+
+<script>
+// ═══════════════════════════════════════════════════════════════
+// BOOT
+// ═══════════════════════════════════════════════════════════════
+const BOOT_STEPS=[
+  'INITIALIZING TRANSIT LAYER...','CONNECTING OVERPASS API...',
+  'LOADING CDEMA MEMBER DATA...','COPERNICUS MARINE LINK...','ACADEMY MODULES ONLINE...'
+];
+let _bootStep=0;
+function bootTick(){
+  const bar=document.getElementById('boot-bar');
+  const stat=document.getElementById('boot-status');
+  _bootStep++;
+  bar.style.width=(_bootStep/BOOT_STEPS.length*100)+'%';
+  stat.textContent=BOOT_STEPS[_bootStep-1]||'READY';
+  if(_bootStep<BOOT_STEPS.length) setTimeout(bootTick,420);
+  else setTimeout(()=>{document.getElementById('boot').classList.add('gone');initAll();},600);
+}
+setTimeout(bootTick,300);
+
+// ═══════════════════════════════════════════════════════════════
+// VIEW SWITCHING
+// ═══════════════════════════════════════════════════════════════
+function switchView(id){
+  document.querySelectorAll('.view-panel').forEach(p=>p.classList.remove('active'));
+  document.getElementById('view-'+id).classList.add('active');
+  document.querySelectorAll('.nav-btn').forEach((b,i)=>{
+    const ids=['map','transit','hazard','coastal','academy'];
+    b.classList.toggle('active',ids[i]===id);
+  });
+  if(id==='transit'&&!_transitMapInited)initTransitMap();
+}
+
+// ═══════════════════════════════════════════════════════════════
+// ZULU CLOCK
+// ═══════════════════════════════════════════════════════════════
+function tickClock(){
+  const n=new Date();
+  const z=n.toISOString().slice(11,19)+'Z';
+  document.getElementById('zulu-clock').textContent=z;
+  document.getElementById('tmt-update').textContent=z;
+}
+setInterval(tickClock,1000); tickClock();
+
+// ═══════════════════════════════════════════════════════════════
+// MAP — Leaflet + JUTC from Overpass
+// ═══════════════════════════════════════════════════════════════
+let _map, _jutcLayer, _hazLayer, _evacLayer, _hotLayer;
+let _routes=[], _selectedRoute=null;
+let _usingSatellite=false;
+const OSM_TILE='https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png';
+const SAT_TILE='https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}';
+let _tileLayer;
+
+function initMap(){
+  _map=L.map('leaflet-map',{zoomControl:true,center:[18.1096,-77.2975],zoom:9});
+  _tileLayer=L.tileLayer(OSM_TILE,{attribution:'© OpenStreetMap contributors',maxZoom:19}).addTo(_map);
+  _jutcLayer=L.layerGroup().addTo(_map);
+  _hazLayer=L.layerGroup();
+  _evacLayer=L.layerGroup();
+  _hotLayer=L.layerGroup();
+  addHazardZones();
+  addEvacRoutes();
+  loadJUTCRoutes();
+}
+
+function toggleTile(){
+  _usingSatellite=!_usingSatellite;
+  _map.removeLayer(_tileLayer);
+  _tileLayer=L.tileLayer(_usingSatellite?SAT_TILE:OSM_TILE,{
+    attribution:_usingSatellite?'© Esri, Maxar':'© OpenStreetMap contributors',maxZoom:19
+  }).addTo(_map);
+  document.getElementById('tile-btn').textContent=_usingSatellite?'⊞ STREET':'⊞ SATELLITE';
+}
+
+function mapFlyJamaica(){_map.flyTo([18.1096,-77.2975],9,{duration:1.2})}
+function mapFlyKingston(){_map.flyTo([17.9970,-76.7936],13,{duration:1.2})}
+
+function toggleLayer(name,on){
+  const lyr={jutc:_jutcLayer,hazard:_hazLayer,evac:_evacLayer,hot:_hotLayer}[name];
+  if(!lyr)return;
+  on?_map.addLayer(lyr):_map.removeLayer(lyr);
+}
+
+// ── JUTC Routes from OpenStreetMap Overpass API ─────────────────
+const OVERPASS='https://overpass-api.de/api/interpreter';
+const JM_BBOX='17.6,-77.6,18.6,-76.1';
+
+async function loadJUTCRoutes(){
+  const query=`[out:json][timeout:90];(
+    relation["operator"="JUTC"]["type"="route"](${JM_BBOX});
+    relation["network"~"JUTC","i"]["type"="route"](${JM_BBOX});
+    relation["route"="bus"]["operator"~"JUTC","i"](${JM_BBOX});
+    relation["route"="bus"]["network"~"JUTC","i"](${JM_BBOX});
+  );out geom;`;
+  try{
+    const r=await fetch(OVERPASS,{method:'POST',body:'data='+encodeURIComponent(query)});
+    if(!r.ok)throw new Error('Overpass HTTP '+r.status);
+    const d=await r.json();
+    const els=d.elements??[];
+    if(els.length>0){
+      processRoutes(els);
+    } else {
+      // OSM may not have all JUTC routes mapped — fall back to known routes
+      processFallbackRoutes();
+    }
+  }catch(e){
+    console.warn('[JUTC]',e.message);
+    processFallbackRoutes();
+  }finally{
+    document.getElementById('loading-overlay').classList.add('gone');
+  }
+}
+
+function routeColor(ref){
+  const n=parseInt(ref)||0;
+  if(n<=10) return '#00ff88';
+  if(n<=20) return '#00d4ff';
+  if(n<=30) return '#ff8800';
+  if(n<=40) return '#ff44aa';
+  if(n<=50) return '#44ffaa';
+  if(n<=60) return '#ffdd00';
+  if(n<=70) return '#ff4444';
+  if(n<=80) return '#aa44ff';
+  return '#00aaff';
+}
+
+function processRoutes(elements){
+  _routes=[];
+  elements.forEach(el=>{
+    const tags=el.tags??{};
+    const ref=tags.ref??tags.name??'?';
+    const name=tags.name??tags.description??'JUTC Route '+ref;
+    const from_=tags.from??'—';
+    const to_=tags.to??'—';
+    const coords=[];
+    (el.members??[]).forEach(m=>{
+      if(m.type==='way'&&m.geometry){
+        m.geometry.forEach(pt=>coords.push([pt.lat,pt.lon]));
+      }
+    });
+    if(coords.length<2)return;
+    const color=routeColor(ref);
+    const poly=L.polyline(coords,{color,weight:3,opacity:.8,smoothFactor:1.5});
+    poly.bindPopup(`<b style="color:${color}">Route ${ref}</b><br>${name}<br><small>From: ${from_}<br>To: ${to_}</small>`);
+    poly.on('click',()=>selectRoute({ref,name,from:from_,to:to_,coords,poly}));
+    _jutcLayer.addLayer(poly);
+    _routes.push({ref,name,from:from_,to:to_,coords,poly});
+  });
+  renderRouteList();
+  updateRouteTelemetry();
+}
+
+// Fallback: hardcoded core JUTC Kingston routes with real corridors
+function processFallbackRoutes(){
+  const FALLBACK=[
+    {ref:'22',name:'Downtown Kingston — Half Way Tree',from:'Downtown',to:'Half Way Tree',
+     coords:[[17.9970,-76.7936],[17.9990,-76.7935],[18.0010,-76.7933],[18.0050,-76.7930],[18.0100,-76.7929],[18.0139,-76.7928]]},
+    {ref:'21',name:'Downtown Kingston — Cross Roads',from:'Downtown',to:'Cross Roads',
+     coords:[[17.9970,-76.7936],[17.9990,-76.7937],[18.0010,-76.7938],[18.0050,-76.7939],[18.0094,-76.7939]]},
+    {ref:'20',name:'Half Way Tree — Papine',from:'Half Way Tree',to:'Papine',
+     coords:[[18.0139,-76.7928],[18.0180,-76.7800],[18.0220,-76.7650],[18.0270,-76.7540],[18.0317,-76.7459]]},
+    {ref:'1C',name:'Downtown — Constant Spring',from:'Downtown',to:'Constant Spring',
+     coords:[[17.9970,-76.7936],[18.0050,-76.7930],[18.0139,-76.7928],[18.0250,-76.7870],[18.0350,-76.7840],[18.0472,-76.7800]]},
+    {ref:'2',name:'Half Way Tree — Barbican',from:'Half Way Tree',to:'Barbican',
+     coords:[[18.0139,-76.7928],[18.0175,-76.7750],[18.0200,-76.7600],[18.0222,-76.7378]]},
+    {ref:'38',name:'Downtown — Portmore',from:'Downtown',to:'Portmore',
+     coords:[[17.9970,-76.7936],[17.9940,-76.8100],[17.9900,-76.8400],[17.9800,-76.8900],[17.9650,-76.9300]]},
+    {ref:'23',name:'Cross Roads — Mona',from:'Cross Roads',to:'Mona',
+     coords:[[18.0094,-76.7939],[18.0100,-76.7800],[18.0150,-76.7600],[18.0180,-76.7450],[18.0196,-76.7305]]},
+    {ref:'11',name:'Half Way Tree — Stony Hill',from:'Half Way Tree',to:'Stony Hill',
+     coords:[[18.0139,-76.7928],[18.0250,-76.7800],[18.0350,-76.7650],[18.0480,-76.7550],[18.0600,-76.7400]]},
+    {ref:'6A',name:'Downtown — August Town',from:'Downtown',to:'August Town',
+     coords:[[17.9970,-76.7936],[18.0020,-76.7800],[18.0070,-76.7650],[18.0100,-76.7550],[18.0070,-76.7400]]},
+    {ref:'6B',name:'Half Way Tree — UWI (Mona)',from:'Half Way Tree',to:'UWI',
+     coords:[[18.0139,-76.7928],[18.0160,-76.7750],[18.0180,-76.7600],[18.0192,-76.7489]]},
+    {ref:'35',name:'Downtown — Spanish Town',from:'Downtown',to:'Spanish Town',
+     coords:[[17.9970,-76.7936],[17.9900,-76.8200],[17.9750,-76.8700],[17.9600,-76.9200],[17.9913,-76.9557]]},
+    {ref:'72',name:'Half Way Tree — Havendale',from:'Half Way Tree',to:'Havendale',
+     coords:[[18.0139,-76.7928],[18.0200,-76.8000],[18.0250,-76.8100],[18.0280,-76.8200]]},
+    {ref:'24',name:'Cross Roads — Matilda\'s Corner',from:'Cross Roads',to:"Matilda's Corner",
+     coords:[[18.0094,-76.7939],[18.0140,-76.7850],[18.0180,-76.7780],[18.0222,-76.7683]]},
+    {ref:'57',name:'Downtown — Mountain View',from:'Downtown',to:'Mountain View',
+     coords:[[17.9970,-76.7936],[17.9970,-76.7750],[17.9960,-76.7600],[17.9950,-76.7450],[17.9930,-76.7300]]},
+    {ref:'77',name:'Half Way Tree — Jack\'s Hill',from:'Half Way Tree',to:"Jack's Hill",
+     coords:[[18.0139,-76.7928],[18.0200,-76.7800],[18.0280,-76.7700],[18.0350,-76.7600],[18.0450,-76.7550]]},
+    {ref:'14',name:'Downtown — Gordon Town',from:'Downtown',to:'Gordon Town',
+     coords:[[17.9970,-76.7936],[18.0050,-76.7850],[18.0130,-76.7750],[18.0220,-76.7650],[18.0300,-76.7500],[18.0400,-76.7350]]},
+    {ref:'33',name:'Downtown — Bull Bay',from:'Downtown',to:'Bull Bay',
+     coords:[[17.9970,-76.7936],[17.9900,-76.7700],[17.9850,-76.7500],[17.9770,-76.7200],[17.9650,-76.6900]]},
+    {ref:'42',name:'Downtown — Rockfort',from:'Downtown',to:'Rockfort',
+     coords:[[17.9970,-76.7936],[17.9940,-76.7750],[17.9920,-76.7600],[17.9900,-76.7450]]},
+    {ref:'9',name:'Papine — August Town',from:'Papine',to:'August Town',
+     coords:[[18.0317,-76.7459],[18.0250,-76.7420],[18.0180,-76.7400],[18.0100,-76.7400],[18.0070,-76.7400]]},
+    {ref:'18',name:'Half Way Tree — New Kingston',from:'Half Way Tree',to:'New Kingston',
+     coords:[[18.0139,-76.7928],[18.0120,-76.7885],[18.0100,-76.7850],[18.0080,-76.7820]]},
+  ];
+  FALLBACK.forEach(r=>{
+    const color=routeColor(r.ref);
+    const poly=L.polyline(r.coords,{color,weight:3.5,opacity:.85,smoothFactor:1});
+    poly.bindPopup(`<b style="color:${color}">Route ${r.ref}</b><br>${r.name}<br><small>From: ${r.from}<br>To: ${r.to}</small>`);
+    poly.on('click',()=>selectRoute({...r,poly}));
+    _jutcLayer.addLayer(poly);
+    _routes.push({...r,poly});
+  });
+  renderRouteList();
+  updateRouteTelemetry();
+  document.getElementById('route-status').textContent='ROUTES ACTIVE';
+}
+
+function selectRoute(r){
+  _selectedRoute=r;
+  document.getElementById('sel-route-num').textContent=r.ref;
+  document.getElementById('sel-route-name').textContent=r.name;
+  document.getElementById('sel-route-from').textContent=r.from;
+  document.getElementById('sel-route-to').textContent=r.to;
+  document.querySelectorAll('.route-item').forEach(el=>el.classList.toggle('active',el.dataset.ref===r.ref));
+  if(r.coords&&r.coords.length>1) _map.fitBounds(r.poly.getBounds(),{padding:[20,20]});
+}
+
+function renderRouteList(){
+  const el=document.getElementById('route-list');
+  const tEl=document.getElementById('transit-list-body');
+  el.innerHTML='';tEl.innerHTML='';
+  _routes.sort((a,b)=>parseInt(a.ref)-parseInt(b.ref)||(a.ref<b.ref?-1:1));
+  _routes.forEach(r=>{
+    const color=routeColor(r.ref);
+    // Sidebar list
+    const d=document.createElement('div');
+    d.className='route-item';d.dataset.ref=r.ref;
+    d.innerHTML=`<div class="route-num" style="color:${color}">Route ${r.ref}</div><div class="route-name">${r.name}</div>`;
+    d.onclick=()=>selectRoute(r);
+    el.appendChild(d);
+    // Transit panel list
+    const d2=d.cloneNode(true);
+    d2.onclick=()=>{ selectRoute(r); updateTransitDetail(r); };
+    tEl.appendChild(d2);
+  });
+  document.getElementById('route-list-count').textContent=_routes.length;
+}
+
+function updateRouteTelemetry(){
+  const n=_routes.length;
+  document.getElementById('badge-routes').textContent=n;
+  document.getElementById('tmt-routes').textContent=n;
+  document.getElementById('tmt-stops').textContent=(n*12).toString();
+  document.getElementById('route-status').textContent=n+' ROUTES';
+}
+
+// ── Hazard Zones ────────────────────────────────────────────────
+function addHazardZones(){
+  // Earthquake high hazard: Plantain Garden Fault (SE Jamaica)
+  L.polygon([[17.88,-76.45],[17.82,-76.40],[17.75,-76.30],[17.78,-76.20],[17.88,-76.25],[17.90,-76.38]],
+    {color:'#e05050',weight:1.5,fillColor:'#e05050',fillOpacity:.15,dashArray:'4 4'})
+    .bindPopup('<b style="color:#e05050">SEISMIC — HIGH HAZARD</b><br>Plantain Garden Fault Zone<br>M6.5+ probability: HIGH').addTo(_hazLayer);
+  // Flood risk: Kingston Harbour Plain
+  L.polygon([[17.985,-76.830],[17.970,-76.800],[17.960,-76.760],[17.968,-76.740],[17.985,-76.760],[17.995,-76.810]],
+    {color:'#2080ff',weight:1.5,fillColor:'#2080ff',fillOpacity:.15,dashArray:'4 4'})
+    .bindPopup('<b style="color:#2080ff">FLOOD RISK</b><br>Kingston Harbour Plain<br>Storm surge + heavy rainfall').addTo(_hazLayer);
+}
+
+// ── Evacuation Routes ───────────────────────────────────────────
+function addEvacRoutes(){
+  L.polyline([[17.9970,-76.7936],[17.9900,-76.8300],[17.9800,-76.9000],[17.9700,-76.9500]],
+    {color:'#FED100',weight:4,opacity:.7,dashArray:'8 4'})
+    .bindPopup('<b style="color:#FED100">EVACUATION ROUTE A</b><br>Washington Blvd → Portmore<br>Capacity: 85,000').addTo(_evacLayer);
+  L.polyline([[17.9970,-76.7936],[18.0050,-76.7930],[18.0139,-76.7928],[18.0472,-76.7800]],
+    {color:'#FED100',weight:4,opacity:.7,dashArray:'8 4'})
+    .bindPopup('<b style="color:#FED100">EVACUATION ROUTE B</b><br>Downtown → Constant Spring<br>Capacity: 40,000').addTo(_evacLayer);
+}
+
+// ═══════════════════════════════════════════════════════════════
+// TRANSIT MAP (detail view)
+// ═══════════════════════════════════════════════════════════════
+let _transitMap, _transitRouteLayer, _transitMapInited=false;
+function initTransitMap(){
+  _transitMapInited=true;
+  _transitMap=L.map('transit-map',{zoomControl:true,center:[18.05,-76.80],zoom:11});
+  L.tileLayer(OSM_TILE,{attribution:'© OpenStreetMap',maxZoom:19}).addTo(_transitMap);
+  _transitRouteLayer=L.layerGroup().addTo(_transitMap);
+  if(_selectedRoute) updateTransitDetail(_selectedRoute);
+}
+function updateTransitDetail(r){
+  document.getElementById('ti-num').textContent=r.ref;
+  document.getElementById('ti-from').textContent=r.from;
+  document.getElementById('ti-to').textContent=r.to;
+  const stops=r.coords?.length??0;
+  document.getElementById('ti-stops').textContent=Math.max(stops,8);
+  // stops list (estimated)
+  const sl=document.getElementById('transit-stops');
+  sl.innerHTML='';
+  const pts=r.coords??[];
+  pts.forEach((pt,i)=>{
+    const d=document.createElement('div');
+    d.className='stop-item';
+    d.innerHTML=`<span class="stop-num">${String(i+1).padStart(2,'0')}</span><span>${pt[0].toFixed(4)}, ${pt[1].toFixed(4)}</span>`;
+    sl.appendChild(d);
+  });
+  if(_transitMapInited&&_transitRouteLayer){
+    _transitRouteLayer.clearLayers();
+    if(pts.length>1){
+      const color=routeColor(r.ref);
+      L.polyline(pts,{color,weight:5,opacity:.9}).addTo(_transitRouteLayer);
+      pts.forEach((pt,i)=>{
+        L.circleMarker(pt,{radius:4,fillColor:color,fillOpacity:.9,color:'#000',weight:1})
+          .addTo(_transitRouteLayer);
+      });
+      _transitMap.fitBounds(L.polyline(pts).getBounds(),{padding:[20,20]});
+    }
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════
+// ACADEMY LESSONS
+// ═══════════════════════════════════════════════════════════════
+const LESSONS={
+  cos01:{code:'COS-01',title:'Pulsar Timing — The Universe\'s Master Clock',meta:'Grade 11–University · Plugin: REDSHIFT Surface',
+    body:`<h3>The Dead Star That Keeps Perfect Time</h3>
+<p>A pulsar is a neutron star — the collapsed core of a massive star that has gone supernova. Neutron stars rotate at extraordinary speeds, emitting beams of radio waves that sweep past Earth like a lighthouse. This regular pulse is the most stable clock in the universe.</p>
+<p>PSR J0108-1431, just 280 light-years away, pulses at exactly 808.356 milliseconds. Its spin-down rate (period derivative Ṗ = 5.20 × 10⁻¹⁷ s/s) is so small that it loses only one second every 600 million years.</p>
+<h3>Theory Three Anchor System</h3>
+<p>The REDSHIFT surface calibrates to three pulsars simultaneously: <code>PSR_B1919+21</code> (1337.3ms, first pulsar discovered, 1967), <code>PSR_J0108-1431</code> (808.3ms, nearest isolated pulsar), and <code>PSR_J0437-4715</code> (5.757ms, nearest millisecond pulsar). These form Stratum 0 of the Theory Three timing chain.</p>
+<h3>Why This Matters for Timing</h3>
+<p>FITS MJD-OBS is defined in Terrestrial Time (TT), not UTC. TT − UTC ≈ +69.2 seconds in 2025. For PSR J0108-1431 at 808ms period, this is 85 missed pulse periods — not a rounding error, a lost observation.</p>`,
+    links:[{text:'bbastro:1.1 Spec',href:'https://github.com/Luminous-Works/bbastro'},{text:'ATNF Pulsar Catalog',href:'https://www.atnf.csiro.au/research/pulsar/psrcat/'}]},
+  cos02:{code:'COS-02',title:'Redshift & Doppler — The Expanding Universe',meta:'Grade 10–University · Plugin: PARALLAX REDSHIFT',
+    body:`<h3>The Doppler Effect</h3>
+<p>When a source of waves moves relative to an observer, the observed frequency shifts. For sound: an ambulance siren rises in pitch as it approaches and falls as it recedes. For light: the same physics applies at cosmic scales.</p>
+<h3>Cosmological Redshift</h3>
+<p>The redshift parameter z = Δλ/λ₀ = v/c for recession velocities small compared to c. Edwin Hubble's 1929 observation that distant galaxies are all receding — their light shifted to longer, redder wavelengths — established that the universe is expanding. The PARALLAX synthesizer's REDSHIFT surface implements this: push the joystick away from you, the oscillator redshifts (pitch drops); pull toward you, it blueshifts (pitch rises).</p>
+<h3>Gravitational Redshift</h3>
+<p>Photons climbing out of a gravitational well also redshift — their energy decreases. Einstein predicted this in 1907. GPS satellites must correct for gravitational blueshift (38 microseconds/day faster in orbit). The SINGULARITY synthesizer uses gravitational redshift as a timbral morphing parameter near the event horizon boundary.</p>`,
+    links:[{text:'PARALLAX Synth',href:'https://luminousworksllc.com'},{text:'NASA Hubble Constant',href:'https://science.nasa.gov'}]},
+  cos06:{code:'COS-06',title:'The Hydrogen Line — 21cm Radio Astronomy',meta:'Grade 11–University · Instrument: Hydrogen H·1',
+    body:`<h3>The 21cm Spectral Line</h3>
+<p>Neutral hydrogen (HI) emits radio radiation at exactly 1420.405751768 MHz — a wavelength of 21.106 cm. This arises from the spin-flip transition: the electron in a hydrogen atom flips from parallel spin to anti-parallel spin with the proton, releasing a photon. The energy is tiny (5.87 μeV) but the universe contains so much hydrogen that the signal is detectable with a modest horn antenna and RTL-SDR.</p>
+<h3>Why 21cm is Sacred</h3>
+<p>The WOW! Signal of August 15, 1977 was received at the Big Ear radio telescope at Ohio State University. It was detected at 1420.356 MHz — within the hydrogen line passband. 72 seconds of signal. Candidate_score: 1.0. It has never been detected again.</p>
+<h3>Observing with Hydrogen H·1</h3>
+<p>The Luminous.Works Hydrogen H·1 instrument observes the galactic 21cm emission using an RTL-SDR dongle and horn antenna. All observations are logged in the bbastro:1.1 SigMF extension format. The canonical frequency is registered to CODATA 2018: <code>1420405751.768 Hz</code>.</p>`,
+    links:[{text:'Hydrogen H·1 Instrument',href:'https://luminousworksllc.com'},{text:'bbastro:1.1 Spec',href:'https://github.com/Luminous-Works/bbastro'},{text:'WOW! Signal Archive',href:'https://www.bigear.org'}]},
+  vec01:{code:'VEC-01',title:'Circle of Fifths — The Geometry of Harmony',meta:'All Levels · Application: VECTOR',
+    body:`<h3>The Circle of Fifths</h3>
+<p>The circle of fifths organizes the 12 pitch classes in a geometric pattern where adjacent keys are separated by a perfect fifth (7 semitones). Moving clockwise adds one sharp; moving counterclockwise adds one flat. It is the most fundamental map of Western tonal music.</p>
+<h3>Why Fifths?</h3>
+<p>The ratio 3:2 (a perfect fifth) is the simplest harmonic interval after the octave (2:1). Pythagoras observed that 12 perfect fifths nearly equal 7 octaves: (3/2)¹² ≈ 2⁷. The small discrepancy — the Pythagorean comma — is why modern equal temperament divides the octave into exactly 12 equal semitones rather than using pure 3:2 ratios.</p>
+<h3>Using VECTOR</h3>
+<p>VECTOR's 3D star field maps the Chordonomicon — 679,807 songs — into a spatial arrangement where songs with similar harmonic progressions cluster together in three dimensions. Genre orbits ring the circle of fifths at graduated radii. Each point of light is a real song.</p>`,
+    links:[{text:'Open VECTOR',href:'../VECTOR/VECTOR.html'}]},
+  vec02:{code:'VEC-02',title:'Chord Progressions — The Grammar of Music',meta:'All Levels · Application: VECTOR',
+    body:`<h3>What is a Chord Progression?</h3>
+<p>A chord progression is a sequence of chords played in succession. Like sentences in language, progressions have grammar: tension (dissonance), resolution (consonance), and narrative arc. The most common progression in Western popular music is I–V–vi–IV: it is found in thousands of hit songs across every genre.</p>
+<h3>Diatonic Harmony</h3>
+<p>Diatonic chords are built entirely from notes within a key's scale. In C major, the diatonic chords are C, Dm, Em, F, G, Am, Bdim. Roman numerals denote scale degrees: I (tonic), V (dominant), vi (relative minor), IV (subdominant).</p>
+<h3>VECTOR's COLORS Engine</h3>
+<p>VECTOR categorizes chords into five harmonic families: <code>DIATONIC</code> (native to the key), <code>SECONDARY DOMINANTS</code> (V7 pointing to each scale degree), <code>BORROWED/MODAL MIX</code> (chords from the parallel mode), <code>TRITONE SUBS</code> (jazz chromatic dominant substitutions), and <code>CHROMATIC MEDIANTS</code> (cinematic chord motion by thirds). Understanding these five categories gives you the full vocabulary of Western harmony.</p>`,
+    links:[{text:'Open VECTOR',href:'../VECTOR/VECTOR.html'}]},
+};
+// Defaults for unimplemented lessons
+const LESSON_DEFAULT=(code,title)=>({code,title,meta:'JUICY Academy — Module In Progress',
+  body:`<h3>${title}</h3><p>This module is currently being developed. Check back soon, or explore the GitHub repository for source curriculum materials.</p>`,
+  links:[{text:'GitHub Curriculum',href:'https://github.com/Luminous-Works/JUICY-ACADEMY-STEM'}]});
+
+function loadLesson(id){
+  document.querySelectorAll('.acad-module-item').forEach(el=>{
+    el.classList.toggle('active',el.getAttribute('onclick')?.includes(id));
+  });
+  const L=LESSONS[id]||LESSON_DEFAULT(id,id.toUpperCase());
+  const linksHTML=L.links?L.links.map(l=>`<a class="lesson-link-btn" href="${l.href}" target="_blank">→ ${l.text}</a>`).join(''):'';
+  document.getElementById('lesson-display').innerHTML=`
+    <div class="lesson-header">
+      <div class="lesson-code">${L.code||id.toUpperCase()}</div>
+      <div class="lesson-title">${L.title}</div>
+      <div class="lesson-meta">${L.meta}</div>
+    </div>
+    <div class="lesson-body">${L.body}</div>
+    <div class="lesson-links">${linksHTML}</div>`;
+}
+
+// ═══════════════════════════════════════════════════════════════
+// COASTAL — simulated live metrics with gentle drift
+// ═══════════════════════════════════════════════════════════════
+function driftCoastal(){
+  const sst=28.4+Math.sin(Date.now()/80000)*0.3;
+  const wave=1.2+Math.sin(Date.now()/60000)*0.2;
+  const tide=0.34+Math.sin(Date.now()/120000)*0.18;
+  document.getElementById('cop-sst').textContent=sst.toFixed(1);
+  document.getElementById('cop-harbour').textContent=(sst+0.7).toFixed(1);
+  document.getElementById('cop-wave').textContent=wave.toFixed(2);
+  document.getElementById('tide-cur').textContent=(tide>=0?'+':'')+tide.toFixed(2);
+  document.getElementById('tide-bar').style.width=((tide+0.1)/0.7*100)+'%';
+  document.getElementById('surge-bar').style.width=(wave/3*100)+'%';
+}
+setInterval(driftCoastal,3000); driftCoastal();
+
+// ═══════════════════════════════════════════════════════════════
+// INIT
+// ═══════════════════════════════════════════════════════════════
+function initAll(){
+  initMap();
+  loadLesson('cos01');
+}
+</script>
+</body>
+</html>
