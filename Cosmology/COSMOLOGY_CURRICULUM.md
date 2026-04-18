@@ -37,6 +37,7 @@ A student who completes this module will understand:
 | COS-03 | All Atoms, One Atom | Bose-Einstein Condensate & collective phase | PLASMA display · Imperial Six |
 | COS-04 | The Calculus of Fractured Time | Fractional derivatives & Mittag-Leffler envelopes | PLASMA PL-01 synthesis engine |
 | COS-05 | The Last Sound | Black hole physics & spaghettification | SINGULARITY |
+| COS-06 | The Channel No One Changed | HI 21cm line, neutral hydrogen, SETI & the WOW! Signal | Hydrogen H·1 |
 
 ---
 
