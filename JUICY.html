@@ -6,12 +6,13 @@
 <title>JUICY ACADEMY · Jamaica STEM Platform v1.0</title>
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.min.js"></script>
 <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet"/>
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 :root{
-  --bg:#020810;--panel:rgba(0,12,24,0.92);--border:rgba(0,166,81,0.22);
-  --accent:#00A651;--gold:#FED100;--text:#d8f0e0;--dim:rgba(200,230,210,0.60);
+  --bg:#020810;--panel:rgba(0,12,24,0.95);--border:rgba(0,166,81,0.38);
+  --accent:#00C861;--gold:#FED100;--text:#e2f4ea;--dim:rgba(210,240,220,0.72);
   --font-mono:'JetBrains Mono',monospace;--font-body:'Inter',sans-serif;
   --red:#e05050;--blue:#2080ff;--orange:#ff8c00;
 }
@@ -32,12 +33,12 @@ html,body{width:100%;height:100%;overflow:hidden;background:var(--bg);color:var(
 .tb-logo{display:flex;flex-direction:column;margin-right:6px}
 .tb-j{font-size:16px;font-weight:800;letter-spacing:.1em;color:var(--accent)}
 .tb-sub{font-size:10px;letter-spacing:.25em;color:var(--dim)}
-.nav-btn{background:transparent;border:1px solid rgba(0,166,81,.18);border-radius:3px;color:var(--dim);font-family:var(--font-mono);font-size:12px;letter-spacing:.15em;padding:4px 12px;cursor:pointer;transition:.15s}
-.nav-btn:hover{color:var(--accent);border-color:rgba(0,166,81,.45)}
-.nav-btn.active{color:var(--accent);border-color:var(--accent);background:rgba(0,166,81,.08)}
+.nav-btn{background:transparent;border:1px solid rgba(0,200,97,.30);border-radius:3px;color:rgba(210,245,225,0.82);font-family:var(--font-mono);font-size:12px;letter-spacing:.15em;padding:4px 12px;cursor:pointer;transition:.15s}
+.nav-btn:hover{color:#00ff88;border-color:rgba(0,200,97,.60);background:rgba(0,166,81,.06)}
+.nav-btn.active{color:#00ff88;border-color:#00C861;background:rgba(0,198,97,.14);box-shadow:0 0 8px rgba(0,200,97,.18)}
 #topbar-right{margin-left:auto;display:flex;align-items:center;gap:10px}
 #zulu-clock{font-size:12px;color:var(--dim);letter-spacing:.12em}
-.status-pill{font-size:10px;letter-spacing:.12em;padding:2px 8px;border-radius:2px;border:1px solid rgba(0,166,81,.28);color:var(--accent)}
+.status-pill{font-size:10px;letter-spacing:.12em;padding:2px 8px;border-radius:2px;border:1px solid rgba(0,200,97,.50);color:#00ff88;background:rgba(0,166,81,.12)}
 /* ── PANELS ───────────────────────────────────────────────────────── */
 #content{flex:1;overflow:hidden;position:relative}
 .view-panel{position:absolute;inset:0;display:none}
@@ -97,8 +98,8 @@ html,body{width:100%;height:100%;overflow:hidden;background:var(--bg);color:var(
 .haz-org{font-size:10px;color:var(--dim);letter-spacing:.1em}
 .haz-body{font-size:11px;color:var(--dim);line-height:1.55;margin-bottom:10px}
 .haz-status{font-size:10px;letter-spacing:.12em;padding:3px 8px;border-radius:2px;display:inline-block}
-.haz-status.active{background:rgba(0,166,81,.15);border:1px solid rgba(0,166,81,.35);color:var(--accent)}
-.haz-status.linked{background:rgba(254,209,0,.10);border:1px solid rgba(254,209,0,.28);color:var(--gold)}
+.haz-status.active{background:rgba(0,200,97,.20);border:1px solid rgba(0,200,97,.55);color:#00ff88}
+.haz-status.linked{background:rgba(254,209,0,.18);border:1px solid rgba(254,209,0,.50);color:#ffe94d}
 .haz-link{display:block;font-size:10px;color:rgba(0,166,81,.7);text-decoration:none;margin-top:6px;letter-spacing:.08em}
 .haz-link:hover{color:var(--accent)}
 .cdema-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:8px;margin-top:10px}
@@ -113,7 +114,7 @@ html,body{width:100%;height:100%;overflow:hidden;background:var(--bg);color:var(
 #view-coastal{flex-direction:column;overflow-y:auto}
 .coastal-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:14px;padding:16px}
 .coast-card{background:var(--panel);border:1px solid var(--border);border-radius:4px;overflow:hidden}
-.coast-hdr{background:rgba(0,30,60,.5);padding:10px 14px;font-size:11px;font-weight:700;letter-spacing:.15em;color:var(--text);border-bottom:1px solid var(--border)}
+.coast-hdr{background:rgba(0,50,100,.80);padding:10px 14px;font-size:11px;font-weight:700;letter-spacing:.15em;color:#b8dcff;border-bottom:1px solid rgba(0,120,220,.40)}
 .coast-body{padding:12px 14px}
 .metric-row{display:flex;justify-content:space-between;align-items:baseline;padding:5px 0;border-bottom:1px solid rgba(0,166,81,.07)}
 .metric-lbl{font-size:10px;color:var(--dim);letter-spacing:.08em}
@@ -162,6 +163,34 @@ html,body{width:100%;height:100%;overflow:hidden;background:var(--bg);color:var(
 ::-webkit-scrollbar{width:4px;height:4px}
 ::-webkit-scrollbar-track{background:rgba(0,0,0,.2)}
 ::-webkit-scrollbar-thumb{background:rgba(0,166,81,.3);border-radius:2px}
+/* ── MOON PANEL ───────────────────────────────────────────────── */
+#view-moon{flex-direction:row}
+#moon-sidebar{width:210px;background:var(--panel);border-right:1px solid var(--border);display:flex;flex-direction:column;flex-shrink:0;overflow:hidden}
+#moon-canvas-wrap{flex:1;position:relative;background:radial-gradient(ellipse at 30% 40%,#0a0a18 0%,#000005 100%);overflow:hidden;cursor:grab}
+#moon-canvas-wrap:active{cursor:grabbing}
+#moon-canvas-wrap canvas{position:absolute;inset:0;width:100%!important;height:100%!important}
+#moon-right{width:230px;background:var(--panel);border-left:1px solid var(--border);display:flex;flex-direction:column;flex-shrink:0;overflow-y:auto}
+.lunar-target{padding:7px 12px;border-bottom:1px solid rgba(0,166,81,.10);cursor:pointer;transition:.12s;position:relative}
+.lunar-target:hover{background:rgba(0,200,97,.07)}
+.lunar-target.active{background:rgba(0,200,97,.13);border-left:2px solid #00C861}
+.lt-id{font-size:9px;font-weight:800;letter-spacing:.18em;color:var(--gold);margin-right:6px;display:inline-block;min-width:22px}
+.lt-n{font-size:11px;font-weight:700;color:var(--text)}
+.lt-d{font-size:9px;color:var(--dim);margin-top:2px;line-height:1.35;letter-spacing:.04em}
+.moon-phase-wrap{padding:12px;text-align:center;border-bottom:1px solid var(--border)}
+.moon-phase-disc{width:72px;height:72px;border-radius:50%;background:#c0c0ca;margin:6px auto;position:relative;overflow:hidden;box-shadow:0 0 24px rgba(180,180,210,.12),inset 0 0 10px rgba(0,0,0,.4)}
+.moon-phase-shadow{position:absolute;inset:0;border-radius:50%;background:#010610;transition:all .8s}
+.moon-phase-lbl{font-size:9px;letter-spacing:.15em;color:var(--dim);margin-top:4px}
+.moon-phase-name{font-size:11px;font-weight:700;color:var(--text);margin-top:2px;letter-spacing:.08em}
+#moon-badge{position:absolute;top:10px;left:10px;background:rgba(0,8,18,.82);border:1px solid rgba(0,200,97,.30);border-radius:3px;padding:3px 9px;font-size:9px;letter-spacing:.14em;color:rgba(0,200,97,.80);pointer-events:none;backdrop-filter:blur(6px)}
+#moon-coords-hud{position:absolute;bottom:10px;left:10px;background:rgba(0,8,18,.82);border:1px solid rgba(0,200,97,.25);border-radius:3px;padding:4px 10px;font-size:10px;color:var(--text);pointer-events:none;backdrop-filter:blur(6px);letter-spacing:.1em}
+#moon-tip{position:absolute;top:10px;right:10px;background:rgba(0,8,18,.75);border:1px solid rgba(255,255,255,.08);border-radius:3px;padding:3px 9px;font-size:9px;letter-spacing:.1em;color:rgba(255,255,255,.35);pointer-events:none}
+.mf-card{padding:12px;border-bottom:1px solid rgba(0,166,81,.10)}
+.mf-code{font-size:9px;letter-spacing:.22em;color:var(--gold)}
+.mf-name{font-size:14px;font-weight:800;color:var(--text);margin:4px 0 2px;letter-spacing:.04em}
+.mf-type{font-size:10px;color:rgba(0,200,97,.80);letter-spacing:.1em;margin-bottom:8px;font-weight:600}
+.mf-body{font-size:11px;color:var(--dim);line-height:1.58;font-family:var(--font-body)}
+.moon-ext-btn{display:block;font-size:10px;letter-spacing:.12em;padding:6px 12px;background:rgba(0,166,81,.10);border:1px solid rgba(0,200,97,.35);border-radius:2px;color:#00ff88;text-decoration:none;text-align:center;cursor:pointer;transition:.15s;margin-bottom:6px}
+.moon-ext-btn:hover{background:rgba(0,200,97,.20);border-color:rgba(0,200,97,.60)}
 </style>
 </head>
 <body>
@@ -188,6 +217,7 @@ html,body{width:100%;height:100%;overflow:hidden;background:var(--bg);color:var(
     <button class="nav-btn" onclick="switchView('transit')">TRANSIT</button>
     <button class="nav-btn" onclick="switchView('hazard')">HAZARD</button>
     <button class="nav-btn" onclick="switchView('coastal')">COASTAL</button>
+    <button class="nav-btn" onclick="switchView('moon')">MOON</button>
     <button class="nav-btn" onclick="switchView('academy')">ACADEMY</button>
     <div id="topbar-right">
       <div class="status-pill" id="route-status">LOADING ROUTES</div>
@@ -452,6 +482,101 @@ html,body{width:100%;height:100%;overflow:hidden;background:var(--bg);color:var(
       </div>
     </div>
 
+    <!-- ═══ MOON ═══ -->
+    <div class="view-panel" id="view-moon">
+      <!-- LEFT: Lunar 100 list + phase -->
+      <div id="moon-sidebar">
+        <div class="sidebar-hdr">LUNAR 100 · L1–L10</div>
+        <div style="flex:1;overflow-y:auto;padding:0">
+          <div class="lunar-target active" id="lt-l1" onclick="selectLunarTarget('l1')">
+            <span class="lt-id">L1</span><span class="lt-n">The Full Moon</span>
+            <div class="lt-d">Naked eye · maria vs highlands</div>
+          </div>
+          <div class="lunar-target" id="lt-l2" onclick="selectLunarTarget('l2')">
+            <span class="lt-id">L2</span><span class="lt-n">Tycho</span>
+            <div class="lt-d">85km · bright ray system · 108 Mya</div>
+          </div>
+          <div class="lunar-target" id="lt-l3" onclick="selectLunarTarget('l3')">
+            <span class="lt-id">L3</span><span class="lt-n">Clavius</span>
+            <div class="lt-d">225km · curved crater chain on floor</div>
+          </div>
+          <div class="lunar-target" id="lt-l4" onclick="selectLunarTarget('l4')">
+            <span class="lt-id">L4</span><span class="lt-n">Copernicus</span>
+            <div class="lt-d">93km · central peak · terraced walls</div>
+          </div>
+          <div class="lunar-target" id="lt-l5" onclick="selectLunarTarget('l5')">
+            <span class="lt-id">L5</span><span class="lt-n">Mare Imbrium</span>
+            <div class="lt-d">1,145km basin · 3.85 Gya · basalt fill</div>
+          </div>
+          <div class="lunar-target" id="lt-l6" onclick="selectLunarTarget('l6')">
+            <span class="lt-id">L6</span><span class="lt-n">Orientale Basin</span>
+            <div class="lt-d">930km multi-ring · near western limb</div>
+          </div>
+          <div class="lunar-target" id="lt-l7" onclick="selectLunarTarget('l7')">
+            <span class="lt-id">L7</span><span class="lt-n">Schröter's Valley</span>
+            <div class="lt-d">Sinuous rille · 160km · Cobra's Head</div>
+          </div>
+          <div class="lunar-target" id="lt-l8" onclick="selectLunarTarget('l8')">
+            <span class="lt-id">L8</span><span class="lt-n">Aristarchus Plateau</span>
+            <div class="lt-d">Most reflective region · outgassing</div>
+          </div>
+          <div class="lunar-target" id="lt-l9" onclick="selectLunarTarget('l9')">
+            <span class="lt-id">L9</span><span class="lt-n">Marius Hills</span>
+            <div class="lt-d">Volcanic dome field · best on Moon</div>
+          </div>
+          <div class="lunar-target" id="lt-l10" onclick="selectLunarTarget('l10')">
+            <span class="lt-id">L10</span><span class="lt-n">Hyginus Rille</span>
+            <div class="lt-d">Collapsed lava tube chain · 220km</div>
+          </div>
+        </div>
+        <div class="sidebar-hdr">MOON PHASE</div>
+        <div class="moon-phase-wrap">
+          <div class="moon-phase-disc" id="moon-phase-disc">
+            <div class="moon-phase-shadow" id="moon-phase-shadow"></div>
+          </div>
+          <div class="moon-phase-lbl" id="moon-phase-lbl">—</div>
+          <div class="moon-phase-name" id="moon-phase-name">—</div>
+        </div>
+        <div style="padding:8px 12px 12px;display:flex;flex-direction:column;gap:5px">
+          <a class="moon-ext-btn" href="https://quickmap.lroc.asu.edu" target="_blank">◈ LROC QUICKMAP</a>
+          <a class="moon-ext-btn" href="https://moon.google.com" target="_blank">◈ GOOGLE MOON</a>
+          <a class="moon-ext-btn" href="https://skyandtelescope.org/stargazing-and-observing/the-lunar-100/" target="_blank">◈ LUNAR 100 LIST</a>
+        </div>
+      </div>
+
+      <!-- CENTRE: Three.js Moon Globe -->
+      <div id="moon-canvas-wrap">
+        <div id="moon-badge">LRO WAC EQUIRECTANGULAR · NASA/GSFC/ASU</div>
+        <div id="moon-coords-hud">LAT — · LON —</div>
+        <div id="moon-tip">DRAG TO ROTATE · SCROLL TO ZOOM</div>
+      </div>
+
+      <!-- RIGHT: Feature detail + data -->
+      <div id="moon-right">
+        <div class="sidebar-hdr">SELECTED FEATURE</div>
+        <div class="mf-card">
+          <div class="mf-code" id="mf-code">COS-07 · L1</div>
+          <div class="mf-name" id="mf-name">The Full Moon</div>
+          <div class="mf-type" id="mf-type">Full Disc · Naked Eye</div>
+          <div class="mf-body" id="mf-body">The Moon as seen with the naked eye reveals the division between the bright, heavily cratered highlands and the dark, smooth maria. At full moon the entire near side is illuminated and ray systems from young craters like Tycho are most visible.</div>
+        </div>
+        <div class="sidebar-hdr">FORMATION RECORD</div>
+        <div style="padding:0 0 4px">
+          <div class="t-card"><div class="t-lbl">AGE</div><div class="t-val" style="font-size:13px">4.51 Gya</div></div>
+          <div class="t-card"><div class="t-lbl">FORMATION</div><div class="t-val" style="font-size:10px;color:var(--dim)">Giant Impact · Theia collision</div></div>
+          <div class="t-card"><div class="t-lbl">LAST VOLCANISM</div><div class="t-val" style="font-size:13px">~1.2 Gya</div></div>
+          <div class="t-card"><div class="t-lbl">DIAMETER</div><div class="t-val" style="font-size:13px">3,474 km</div></div>
+          <div class="t-card"><div class="t-lbl">LATE HEAVY BOMBARDMENT</div><div class="t-val" style="font-size:11px;color:var(--gold)">4.1 – 3.8 Gya</div></div>
+        </div>
+        <div class="sidebar-hdr">COS-07 CURRICULUM</div>
+        <div style="padding:10px 12px">
+          <p style="font-size:11px;color:var(--dim);line-height:1.55;margin-bottom:10px;font-family:var(--font-body)">Lunar Geology, the Lunar 100 &amp; Selenography. 90-minute module with Caribbean observational context and ACEAP 2026 tie-in.</p>
+          <span class="moon-ext-btn" onclick="switchView('academy');loadLesson('cos07')">→ OPEN COS-07 LESSON</span>
+          <a class="moon-ext-btn" href="https://lunar.gsfc.nasa.gov" target="_blank">→ NASA LRO MISSION</a>
+        </div>
+      </div>
+    </div>
+
     <!-- ═══ ACADEMY ═══ -->
     <div class="view-panel" id="view-academy">
       <div id="academy-nav">
@@ -462,6 +587,7 @@ html,body{width:100%;height:100%;overflow:hidden;background:var(--bg);color:var(
         <div class="acad-module-item" onclick="loadLesson('cos04')"><span class="acad-module-code">COS-04</span>Fractional Calculus</div>
         <div class="acad-module-item" onclick="loadLesson('cos05')"><span class="acad-module-code">COS-05</span>Black Holes</div>
         <div class="acad-module-item" onclick="loadLesson('cos06')"><span class="acad-module-code">COS-06</span>Hydrogen Line 21cm</div>
+        <div class="acad-module-item" onclick="loadLesson('cos07')"><span class="acad-module-code">COS-07</span>The Moon — Silent Archive</div>
         <div class="acad-module-hdr">SIGNAL PHYSICS</div>
         <div class="acad-module-item" onclick="loadLesson('sp01')"><span class="acad-module-code">SP-01</span>Resonance Thresholds</div>
         <div class="acad-module-item" onclick="loadLesson('sp02')"><span class="acad-module-code">SP-02</span>SigMF Protocol</div>
@@ -522,10 +648,11 @@ function switchView(id){
   document.querySelectorAll('.view-panel').forEach(p=>p.classList.remove('active'));
   document.getElementById('view-'+id).classList.add('active');
   document.querySelectorAll('.nav-btn').forEach((b,i)=>{
-    const ids=['map','transit','hazard','coastal','academy'];
+    const ids=['map','transit','hazard','coastal','moon','academy'];
     b.classList.toggle('active',ids[i]===id);
   });
   if(id==='transit'&&!_transitMapInited)initTransitMap();
+  if(id==='moon') setTimeout(initMoon,80);
 }
 
 // ═══════════════════════════════════════════════════════════════
@@ -852,6 +979,21 @@ const LESSONS={
 <h3>VECTOR's COLORS Engine</h3>
 <p>VECTOR categorizes chords into five harmonic families: <code>DIATONIC</code> (native to the key), <code>SECONDARY DOMINANTS</code> (V7 pointing to each scale degree), <code>BORROWED/MODAL MIX</code> (chords from the parallel mode), <code>TRITONE SUBS</code> (jazz chromatic dominant substitutions), and <code>CHROMATIC MEDIANTS</code> (cinematic chord motion by thirds). Understanding these five categories gives you the full vocabulary of Western harmony.</p>`,
     links:[{text:'Open VECTOR',href:'../VECTOR/VECTOR.html'}]},
+  cos07:{code:'COS-07',title:'The Moon — Earth\'s Silent Archive',meta:'Grade 9–University · 90 min · Caribbean Observational Programme · ACEAP 2026',
+    body:`<h3>The Giant Impact Hypothesis</h3>
+<p>4.5 billion years ago a Mars-sized body called <strong>Theia</strong> struck the proto-Earth at an oblique angle. The collision vaporised much of Earth's mantle and ejected a cloud of debris that rapidly accreted into the Moon. Three anomalies confirm this: (1) the Moon is nearly devoid of volatile elements — boiled away in the high-energy impact; (2) its composition matches Earth's mantle, not its iron core; (3) the Earth-Moon angular momentum is consistent only with an oblique impact.</p>
+<h3>Reading the Lunar Surface</h3>
+<p>The Moon has no wind, no rain, no plate tectonics. Every impact is preserved in the record. <strong>Simple craters</strong> (&lt;15km): bowl-shaped, depth:diameter ≈ 1:5. <strong>Complex craters</strong> (15–300km): central rebound peak, terraced inner walls — <code>Tycho (85km)</code> and <code>Copernicus (93km)</code> are textbook examples. <strong>Multi-ring basins</strong> (&gt;300km): Mare Imbrium (1,145km) formed 3.85 billion years ago, dated precisely by Apollo 15 basalt samples.</p>
+<h3>Mare Basalts — The Dark Seas</h3>
+<p>The dark maria visible to the naked eye are solidified basalt lava plains. After the Late Heavy Bombardment (4.1–3.8 Gya), the Moon's still-molten interior flooded large impact basins with low-viscosity basaltic lava between 3.9 and 3.0 billion years ago. Mare basalts are rich in iron (15–25% FeO) and depleted in the volatiles consistent with the Giant Impact.</p>
+<h3>The Lunar 100 — Observational Programme</h3>
+<p>Charles Wood's Lunar 100 (Sky &amp; Telescope, April 2004) is a structured observational challenge from L1 (full disc) to L100 (subtle features), analogous to the Messier List for deep-sky observers. From Jamaica (17–18°N), the Moon arcs high and clear across the southern sky — excellent observational geometry. The JUICY MOON panel provides the full top-10 target list with descriptions from COS-07.</p>
+<h3>Caribbean Observation Notes</h3>
+<p><strong>Tycho (L2)</strong> — rays extend 2,000km at full moon, spectacular naked-eye. <strong>Mare Crisium</strong> — demonstrates libration; observe its distance from the eastern limb across the monthly cycle. <strong>Schröter's Valley (L7)</strong> — largest sinuous rille; the Cobra's Head vent is visible at first quarter. <strong>Straight Wall (Rupes Recta)</strong> — casts a sharp shadow 1–2 days after first quarter; glows white 1–2 days before last quarter. The ACEAP 2026 Chile expedition to Cerro Tololo gives Caribbean students access to lunar photography at near-professional resolution.</p>`,
+    links:[{text:'Open Moon Panel',href:'#',onclick:'switchView(\'moon\')'},
+           {text:'LROC QuickMap',href:'https://quickmap.lroc.asu.edu'},
+           {text:'Lunar 100 List',href:'https://skyandtelescope.org/stargazing-and-observing/the-lunar-100/'},
+           {text:'NASA LRO Mission',href:'https://lunar.gsfc.nasa.gov/'}]},
 };
 // Defaults for unimplemented lessons
 const LESSON_DEFAULT=(code,title)=>({code,title,meta:'JUICY Academy — Module In Progress',
@@ -863,7 +1005,9 @@ function loadLesson(id){
     el.classList.toggle('active',el.getAttribute('onclick')?.includes(id));
   });
   const L=LESSONS[id]||LESSON_DEFAULT(id,id.toUpperCase());
-  const linksHTML=L.links?L.links.map(l=>`<a class="lesson-link-btn" href="${l.href}" target="_blank">→ ${l.text}</a>`).join(''):'';
+  const linksHTML=L.links?L.links.map(l=>l.onclick
+    ?`<span class="lesson-link-btn" onclick="${l.onclick}" style="cursor:pointer">→ ${l.text}</span>`
+    :`<a class="lesson-link-btn" href="${l.href}" target="_blank">→ ${l.text}</a>`).join(''):'';
   document.getElementById('lesson-display').innerHTML=`
     <div class="lesson-header">
       <div class="lesson-code">${L.code||id.toUpperCase()}</div>
@@ -872,6 +1016,186 @@ function loadLesson(id){
     </div>
     <div class="lesson-body">${L.body}</div>
     <div class="lesson-links">${linksHTML}</div>`;
+}
+
+// ═══════════════════════════════════════════════════════════════
+// MOON — Three.js rotating globe + Lunar 100
+// ═══════════════════════════════════════════════════════════════
+const LUNAR_TARGETS={
+  l1:{code:'COS-07 · L1',name:'The Full Moon',type:'Full Disc · Naked Eye',rotY:0,
+    body:'The Moon as seen with the naked eye reveals the dark maria against the bright highlands. At full phase every ray system is illuminated — Tycho\'s rays stretch 2,000km. The division between ancient cratered highlands (4+ Gya) and younger volcanic maria (3.0–3.9 Gya) is visible with no instrument.'},
+  l2:{code:'COS-07 · L2',name:'Tycho',type:'Impact Crater · 85km · 108 Mya',rotY:0.19,
+    body:'Only 108 million years old — one of the freshest large craters on the Moon. Its central peak rises 1.6km from the floor; terraced inner walls show crustal collapse. At full moon, the bright ejecta ray system extending 2,000km across the surface is spectacular naked-eye. Best structural detail at first or last quarter under oblique lighting.'},
+  l3:{code:'COS-07 · L3',name:'Clavius',type:'Impact Crater · 225km',rotY:0.24,
+    body:'One of the largest craters on the near side. Clavius\'s floor hosts a chain of progressively smaller craters — each formed by secondary impacts from the main event, curving across the vast floor. The chain is visible in binoculars at first quarter.'},
+  l4:{code:'COS-07 · L4',name:'Copernicus',type:'Complex Crater · 93km · ~800 Mya',rotY:0.35,
+    body:'The textbook complex crater. Central rebound peak rises 1.2km from the floor. Terraced inner walls formed by collapse. A well-developed ray system makes it prominent near full moon. Formed approximately 800 million years ago — old enough to be without vegetation context, young enough to still show crisp morphology.'},
+  l5:{code:'COS-07 · L5',name:'Mare Imbrium',type:'Impact Basin · 1,145km · 3.85 Gya',rotY:0.26,
+    body:'The largest distinct circular mare on the near side. The basin formed 3.85 billion years ago — a date cross-calibrated between Apollo 15 radiometric samples and crater density counts. Subsequently flooded by basaltic lava (3.3 Gya), Imbrium\'s smooth floor shows wrinkle ridges from lava contraction. Visible from Earth as the dominant bright circle on the upper-left near side.'},
+  l6:{code:'COS-07 · L6',name:'Orientale Basin',type:'Multi-Ring Basin · 930km',rotY:-0.9,
+    body:'The youngest and best-preserved multi-ring impact basin. Its three concentric rings — the Montes Rook and Montes Cordillera — are shock-propagation ridges from the impact wave moving through the crust. Located near the western limb: only visible with good libration. The best analog on any terrestrial planet to the large multi-ring basins.'},
+  l7:{code:'COS-07 · L7',name:"Schröter's Valley",type:'Sinuous Rille · 160km · Cobra\'s Head',rotY:-0.89,
+    body:"The Moon's largest sinuous rille — a channel carved by flowing lava. 10km wide at its widest, 1km deep. The Cobra's Head at its north end is the source vent: a volcanic collapse pit 6km in diameter. Best observed at first quarter when oblique illumination reveals its depth. Discovered by Johann Schröter in the 18th century."},
+  l8:{code:'COS-07 · L8',name:'Aristarchus Plateau',type:'Volcanic Plateau · Highest Albedo',rotY:-0.82,
+    body:'The most reflective area on the Moon. Aristarchus crater (40km, ~175 Mya) reaches albedo three times the average lunar surface. The plateau shows evidence of past outgassing and pyroclastic deposits. On the terminator, Aristarchus sometimes glows noticeably before surrounding terrain catches the sunrise.'},
+  l9:{code:'COS-07 · L9',name:'Marius Hills',type:'Volcanic Dome Field',rotY:-0.70,
+    body:'The best example of a lunar volcanic dome field — over 20 domes formed by effusive eruptions of viscous lava. Domes are low, broad structures 5–10km across, similar to shield volcanoes on Earth. Several sinuous rilles cut through the field. Best observed near the terminator when shadows reveal the subtle topography.'},
+  l10:{code:'COS-07 · L10',name:'Hyginus Rille',type:'Collapsed Lava Tube · 220km',rotY:0.05,
+    body:'A 220km rille with a distinctive chain of craters along its entire length — suggesting the rille formed by the collapse of an underground lava tube network rather than a fault. The craters are depressions, not impact craters. Hyginus crater at the centre may itself be a volcanic collapse feature rather than an impact.'},
+};
+
+let _moonInited=false,_moonRenderer,_moonScene,_moonCamera,_moonMesh,_moonAnimId;
+let _moonDrag=false,_moonDragX=0,_moonDragY=0,_moonAutoRot=true;
+
+function initMoon(){
+  if(_moonInited)return;
+  _moonInited=true;
+  const wrap=document.getElementById('moon-canvas-wrap');
+  const w=wrap.clientWidth,h=wrap.clientHeight;
+  _moonScene=new THREE.Scene();
+  _moonCamera=new THREE.PerspectiveCamera(38,w/h,0.1,200);
+  _moonCamera.position.z=2.8;
+  _moonRenderer=new THREE.WebGLRenderer({antialias:true,alpha:true});
+  _moonRenderer.setPixelRatio(Math.min(window.devicePixelRatio,2));
+  _moonRenderer.setSize(w,h);
+  _moonRenderer.setClearColor(0x000000,0);
+  wrap.appendChild(_moonRenderer.domElement);
+
+  // Star field
+  const sg=new THREE.BufferGeometry();
+  const sp=[];
+  for(let i=0;i<3200;i++){
+    const th=Math.random()*Math.PI*2,ph=Math.acos(2*Math.random()-1),r=70+Math.random()*20;
+    sp.push(r*Math.sin(ph)*Math.cos(th),r*Math.sin(ph)*Math.sin(th),r*Math.cos(ph));
+  }
+  sg.setAttribute('position',new THREE.Float32BufferAttribute(sp,3));
+  _moonScene.add(new THREE.Points(sg,new THREE.PointsMaterial({color:0xffffff,size:0.10,sizeAttenuation:true})));
+
+  // Moon sphere — NASA/Three.js LRO texture
+  const loader=new THREE.TextureLoader();
+  loader.crossOrigin='anonymous';
+  const tex=loader.load('https://threejs.org/examples/textures/planets/moon_1024.jpg',
+    undefined,undefined,
+    ()=>{ // CORS fallback: generate procedural grey sphere
+      const cv=document.createElement('canvas');cv.width=512;cv.height=256;
+      const ctx=cv.getContext('2d');
+      const grd=ctx.createRadialGradient(256,128,40,256,128,200);
+      grd.addColorStop(0,'#c8c8ce');grd.addColorStop(0.6,'#aaaaaf');grd.addColorStop(1,'#888890');
+      ctx.fillStyle=grd;ctx.fillRect(0,0,512,256);
+      for(let i=0;i<800;i++){
+        const x=Math.random()*512,y=Math.random()*256,r=Math.random()*6+1;
+        const g=ctx.createRadialGradient(x,y,0,x,y,r);
+        g.addColorStop(0,'rgba(80,80,88,0.6)');g.addColorStop(1,'rgba(80,80,88,0)');
+        ctx.fillStyle=g;ctx.beginPath();ctx.arc(x,y,r,0,Math.PI*2);ctx.fill();
+      }
+      if(_moonMesh) _moonMesh.material.map=new THREE.CanvasTexture(cv);
+    }
+  );
+  const geo=new THREE.SphereGeometry(1,64,64);
+  const mat=new THREE.MeshStandardMaterial({map:tex,roughness:0.96,metalness:0.0});
+  _moonMesh=new THREE.Mesh(geo,mat);
+  _moonScene.add(_moonMesh);
+
+  // Atmosphere glow ring
+  const glowGeo=new THREE.SphereGeometry(1.04,64,64);
+  const glowMat=new THREE.MeshBasicMaterial({color:0x2a3060,transparent:true,opacity:0.08,side:THREE.BackSide});
+  _moonScene.add(new THREE.Mesh(glowGeo,glowMat));
+
+  // Lighting — Sun from upper-left as seen from Earth
+  const sun=new THREE.DirectionalLight(0xfff8e7,2.4);
+  sun.position.set(-2.5,1.5,3.0);
+  _moonScene.add(sun);
+  _moonScene.add(new THREE.AmbientLight(0x0d1525,0.28));
+
+  // Mouse drag rotation
+  const cv=_moonRenderer.domElement;
+  cv.addEventListener('mousedown',e=>{_moonDrag=true;_moonAutoRot=false;_moonDragX=e.clientX;_moonDragY=e.clientY});
+  window.addEventListener('mousemove',e=>{
+    if(!_moonDrag)return;
+    const dx=e.clientX-_moonDragX,dy=e.clientY-_moonDragY;
+    _moonMesh.rotation.y+=dx*0.004;
+    _moonMesh.rotation.x=Math.max(-1.2,Math.min(1.2,_moonMesh.rotation.x+dy*0.004));
+    _moonDragX=e.clientX;_moonDragY=e.clientY;
+    const lon=((_moonMesh.rotation.y*180/Math.PI%360)+540)%360-180;
+    const lat=-_moonMesh.rotation.x*180/Math.PI;
+    document.getElementById('moon-coords-hud').textContent=`LAT ${lat.toFixed(1)}° · LON ${lon.toFixed(1)}°`;
+  });
+  window.addEventListener('mouseup',()=>{if(_moonDrag){_moonDrag=false;setTimeout(()=>{_moonAutoRot=true},5000)}});
+  cv.addEventListener('wheel',e=>{
+    e.preventDefault();
+    _moonCamera.position.z=Math.max(1.5,Math.min(5.5,_moonCamera.position.z+e.deltaY*0.003));
+  },{passive:false});
+
+  // Render loop
+  (function tick(){
+    _moonAnimId=requestAnimationFrame(tick);
+    if(!_moonDrag&&_moonAutoRot)_moonMesh.rotation.y+=0.0006;
+    _moonRenderer.render(_moonScene,_moonCamera);
+  })();
+
+  // Moon phase
+  updateMoonPhase();
+
+  // Resize
+  const ro=new ResizeObserver(()=>{
+    const nw=wrap.clientWidth,nh=wrap.clientHeight;
+    if(!nw||!nh)return;
+    _moonCamera.aspect=nw/nh;_moonCamera.updateProjectionMatrix();_moonRenderer.setSize(nw,nh);
+  });
+  ro.observe(wrap);
+}
+
+function selectLunarTarget(id){
+  document.querySelectorAll('.lunar-target').forEach(el=>el.classList.remove('active'));
+  const el=document.getElementById('lt-'+id);if(el)el.classList.add('active');
+  const t=LUNAR_TARGETS[id];if(!t)return;
+  document.getElementById('mf-code').textContent=t.code;
+  document.getElementById('mf-name').textContent=t.name;
+  document.getElementById('mf-type').textContent=t.type;
+  document.getElementById('mf-body').textContent=t.body;
+  if(_moonMesh&&_moonInited){
+    _moonAutoRot=false;
+    const targetY=t.rotY;
+    let cur=_moonMesh.rotation.y;
+    let delta=((targetY-cur)%(Math.PI*2)+Math.PI*3)%(Math.PI*2)-Math.PI;
+    const start=cur,end=cur+delta;
+    let t0=null;
+    function animRot(ts){
+      if(!t0)t0=ts;
+      const p=Math.min((ts-t0)/1200,1);
+      const ease=p<0.5?2*p*p:-1+(4-2*p)*p;
+      _moonMesh.rotation.y=start+delta*ease;
+      if(p<1)requestAnimationFrame(animRot);
+      else setTimeout(()=>{_moonAutoRot=true},6000);
+    }
+    requestAnimationFrame(animRot);
+  }
+}
+
+function updateMoonPhase(){
+  const known=new Date('2000-01-06T18:14:00Z');
+  const synodic=29.530588853;
+  const phase=((Date.now()-known.getTime())/86400000%synodic+synodic)%synodic;
+  const frac=phase/synodic;
+  const names=['NEW MOON','WAXING CRESCENT','FIRST QUARTER','WAXING GIBBOUS','FULL MOON','WANING GIBBOUS','LAST QUARTER','WANING CRESCENT'];
+  const thresholds=[0.025,0.24,0.26,0.49,0.51,0.74,0.76,1.0];
+  let phaseName=names[7];
+  for(let i=0;i<thresholds.length;i++){if(frac<thresholds[i]){phaseName=names[i];break;}}
+  // Phase shadow CSS: dark overlay covering the unlit portion
+  const shadow=document.getElementById('moon-phase-shadow');
+  if(frac<0.5){
+    const lit=frac*2;
+    shadow.style.left='0';shadow.style.right='';
+    shadow.style.width=(100-lit*100)+'%';
+    shadow.style.borderRadius='0 50% 50% 0';
+  } else {
+    const lit=(1-frac)*2;
+    shadow.style.right='0';shadow.style.left='';
+    shadow.style.width=(100-lit*100)+'%';
+    shadow.style.borderRadius='50% 0 0 50%';
+  }
+  document.getElementById('moon-phase-lbl').textContent=`DAY ${phase.toFixed(1)} OF ${synodic.toFixed(1)}`;
+  document.getElementById('moon-phase-name').textContent=phaseName;
 }
 
 // ═══════════════════════════════════════════════════════════════
