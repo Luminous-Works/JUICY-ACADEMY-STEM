@@ -1,0 +1,58 @@
+/* PUFFY BUTTON SYSTEM - Reusable across JUICY Academy and ALIEN Series */
+
+.btn {
+    padding: 16px 36px;
+    font-size: 1rem;
+    font-weight: 600;
+    border: none;
+    cursor: pointer;
+    text-decoration: none;
+    display: inline-block;
+    transition: all 0.2s ease;
+    border-radius: 6px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.15);
+}
+
+/* Primary Button - Solid gradient with deep shadow */
+.btn-primary {
+    background: linear-gradient(135deg, #0d5f6f 0%, #0a4a56 100%);
+    color: white;
+    box-shadow: 0 6px 20px rgba(13, 95, 111, 0.3);
+}
+
+.btn-primary:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 12px 32px rgba(13, 95, 111, 0.4);
+}
+
+.btn-primary:active {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(13, 95, 111, 0.3);
+}
+
+/* Secondary Button - Outline with lift */
+.btn-secondary {
+    background: white;
+    color: #0d5f6f;
+    border: 2px solid #0d5f6f;
+    box-shadow: 0 4px 15px rgba(13, 95, 111, 0.1);
+}
+
+.btn-secondary:hover {
+    background: #0d5f6f;
+    color: white;
+    transform: translateY(-4px);
+    box-shadow: 0 12px 32px rgba(13, 95, 111, 0.3);
+}
+
+.btn-secondary:active {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(13, 95, 111, 0.2);
+}
+
+/* CUSTOMIZATION GUIDE
+   Replace #0d5f6f with your primary color
+   Replace #0a4a56 with your darker accent
+   Adjust padding (16px 36px) for your text scale
+   Shadow depth (0 6px 20px) controls the "puffiness"
+*/

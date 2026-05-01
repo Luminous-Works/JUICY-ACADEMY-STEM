@@ -1,0 +1,526 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JUICY: Jamaica's Environmental Heritage Protection Infrastructure</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --color-ocean: #0d5f6f;
+            --color-forest: #1a7659;
+            --color-earth: #8b6f47;
+            --color-limestone: #f5f0e8;
+            --color-accent-coral: #d97a4a;
+            --color-water-light: #4db8c4;
+            --font-display: 'Georgia', serif;
+            --font-body: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+        }
+
+        body {
+            font-family: var(--font-body);
+            line-height: 1.6;
+            color: #1a1a1a;
+            background: linear-gradient(135deg, #f5f0e8 0%, #e8dcc8 100%);
+        }
+
+        /* HEADER */
+        header {
+            background: linear-gradient(180deg, var(--color-ocean) 0%, #0a4a56 100%);
+            color: white;
+            padding: 1rem 2rem;
+            position: fixed;
+            width: 100%;
+            top: 0;
+            z-index: 1000;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+        }
+
+        header h1 {
+            font-family: var(--font-display);
+            font-size: 1.4rem;
+            font-weight: 700;
+            letter-spacing: -0.5px;
+        }
+
+        header p {
+            font-size: 0.85rem;
+            opacity: 0.9;
+            margin-top: 0.25rem;
+        }
+
+        /* HERO */
+        .hero {
+            margin-top: 80px;
+            position: relative;
+            overflow: hidden;
+            padding: 80px 2rem;
+            text-align: center;
+        }
+
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: radial-gradient(ellipse at 20% 50%, rgba(77, 184, 196, 0.15) 0%, transparent 50%),
+                        radial-gradient(ellipse at 80% 50%, rgba(26, 118, 89, 0.1) 0%, transparent 50%);
+            pointer-events: none;
+        }
+
+        .hero-content {
+            position: relative;
+            z-index: 1;
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        .hero h2 {
+            font-family: var(--font-display);
+            font-size: 3.2rem;
+            font-weight: 700;
+            line-height: 1.2;
+            margin-bottom: 1rem;
+            color: var(--color-ocean);
+        }
+
+        .hero h2 .highlight {
+            color: var(--color-accent-coral);
+        }
+
+        .hero p {
+            font-size: 1.2rem;
+            color: #333;
+            max-width: 700px;
+            margin: 0 auto 2rem;
+            line-height: 1.8;
+        }
+
+        .cta-group {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .cta-button {
+            padding: 14px 32px;
+            font-size: 1rem;
+            font-weight: 600;
+            border: none;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-block;
+            transition: all 0.3s ease;
+            border-radius: 3px;
+        }
+
+        .cta-primary {
+            background: var(--color-ocean);
+            color: white;
+            box-shadow: 0 4px 12px rgba(13, 95, 111, 0.25);
+        }
+
+        .cta-primary:hover {
+            background: #0a4a56;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(13, 95, 111, 0.35);
+        }
+
+        .cta-secondary {
+            background: transparent;
+            color: var(--color-ocean);
+            border: 2px solid var(--color-ocean);
+        }
+
+        .cta-secondary:hover {
+            background: var(--color-ocean);
+            color: white;
+        }
+
+        /* SITES GRID */
+        .sites-section {
+            padding: 80px 2rem;
+            background: white;
+            margin-top: 40px;
+        }
+
+        .sites-header {
+            max-width: 900px;
+            margin: 0 auto 60px;
+            text-align: center;
+        }
+
+        .sites-header h3 {
+            font-family: var(--font-display);
+            font-size: 2.4rem;
+            color: var(--color-ocean);
+            margin-bottom: 1rem;
+        }
+
+        .sites-header p {
+            font-size: 1.1rem;
+            color: #555;
+            max-width: 700px;
+            margin: 0 auto;
+        }
+
+        .sites-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 2rem;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .site-card {
+            background: linear-gradient(135deg, #fafaf8 0%, #f0ebe5 100%);
+            border-radius: 3px;
+            overflow: hidden;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+            transition: all 0.3s ease;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .site-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 8px 24px rgba(0,0,0,0.12);
+        }
+
+        .site-icon {
+            height: 120px;
+            background: linear-gradient(135deg, var(--color-forest) 0%, var(--color-water-light) 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 3rem;
+        }
+
+        .site-card:nth-child(2) .site-icon {
+            background: linear-gradient(135deg, var(--color-water-light) 0%, #2a9fb0 100%);
+        }
+
+        .site-card:nth-child(3) .site-icon {
+            background: linear-gradient(135deg, #5a7f80 0%, var(--color-forest) 100%);
+        }
+
+        .site-card:nth-child(4) .site-icon {
+            background: linear-gradient(135deg, var(--color-earth) 0%, #9b7f4f 100%);
+        }
+
+        .site-content {
+            padding: 2rem;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .site-name {
+            font-family: var(--font-display);
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--color-ocean);
+            margin-bottom: 0.5rem;
+        }
+
+        .site-type {
+            font-size: 0.85rem;
+            color: var(--color-accent-coral);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 1rem;
+            font-weight: 600;
+        }
+
+        .site-description {
+            color: #555;
+            margin-bottom: 1.5rem;
+            flex: 1;
+            font-size: 0.95rem;
+            line-height: 1.7;
+        }
+
+        .site-status {
+            font-size: 0.85rem;
+            padding: 0.75rem;
+            background: rgba(13, 95, 111, 0.08);
+            border-left: 3px solid var(--color-ocean);
+            color: #333;
+        }
+
+        /* MONITORING SECTION */
+        .monitoring-section {
+            padding: 80px 2rem;
+            background: linear-gradient(135deg, var(--color-limestone) 0%, #ddd5c8 100%);
+        }
+
+        .monitoring-header {
+            max-width: 900px;
+            margin: 0 auto 60px;
+            text-align: center;
+        }
+
+        .monitoring-header h3 {
+            font-family: var(--font-display);
+            font-size: 2.4rem;
+            color: var(--color-ocean);
+            margin-bottom: 1rem;
+        }
+
+        .monitoring-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 2rem;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .metric-card {
+            background: white;
+            padding: 2rem;
+            border-radius: 3px;
+            text-align: center;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+        }
+
+        .metric-number {
+            font-family: var(--font-display);
+            font-size: 2.8rem;
+            font-weight: 700;
+            color: var(--color-accent-coral);
+            margin-bottom: 0.5rem;
+        }
+
+        .metric-label {
+            color: #555;
+            font-size: 0.95rem;
+            line-height: 1.6;
+        }
+
+        /* UNESCO SECTION */
+        .unesco-section {
+            padding: 80px 2rem;
+            background: white;
+        }
+
+        .unesco-content {
+            max-width: 900px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 4rem;
+            align-items: center;
+        }
+
+        .unesco-text h3 {
+            font-family: var(--font-display);
+            font-size: 2.2rem;
+            color: var(--color-ocean);
+            margin-bottom: 1rem;
+        }
+
+        .unesco-text p {
+            color: #555;
+            margin-bottom: 1.5rem;
+            line-height: 1.8;
+            font-size: 1.05rem;
+        }
+
+        .unesco-visual {
+            background: linear-gradient(135deg, var(--color-ocean) 0%, var(--color-forest) 100%);
+            height: 400px;
+            border-radius: 3px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 4rem;
+            box-shadow: 0 8px 24px rgba(13, 95, 111, 0.2);
+        }
+
+        /* FOOTER */
+        footer {
+            background: var(--color-ocean);
+            color: white;
+            padding: 3rem 2rem;
+            text-align: center;
+        }
+
+        footer p {
+            margin-bottom: 1rem;
+        }
+
+        footer .footer-links {
+            margin-top: 2rem;
+            padding-top: 2rem;
+            border-top: 1px solid rgba(255,255,255,0.2);
+        }
+
+        footer a {
+            color: var(--color-water-light);
+            text-decoration: none;
+            margin: 0 1rem;
+            transition: color 0.3s;
+        }
+
+        footer a:hover {
+            color: white;
+        }
+
+        /* RESPONSIVE */
+        @media (max-width: 768px) {
+            .hero h2 {
+                font-size: 2.2rem;
+            }
+
+            .sites-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .monitoring-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .unesco-content {
+                grid-template-columns: 1fr;
+            }
+
+            .unesco-visual {
+                height: 300px;
+            }
+
+            .cta-group {
+                flex-direction: column;
+            }
+
+            .cta-button {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>JUICY</h1>
+        <p>Jamaica's Environmental Heritage Protection Infrastructure</p>
+    </header>
+
+    <div class="hero">
+        <div class="hero-content">
+            <h2>Protecting Jamaica's <span class="highlight">Natural Heritage</span> in Real Time</h2>
+            <p>JUICY provides real-time environmental monitoring, scientific data collection, and conservation infrastructure for Jamaica's four critical natural sites. Our mission: secure UNESCO World Heritage status for Cockpit Country, Glistening Waters, Blue Mountains, and Green Grotto.</p>
+            <div class="cta-group">
+                <button class="cta-button cta-primary">Learn About Our Sites</button>
+                <button class="cta-button cta-secondary">View Live Monitoring</button>
+            </div>
+        </div>
+    </div>
+
+    <section class="sites-section">
+        <div class="sites-header">
+            <h3>Jamaica's Four Critical Sites</h3>
+            <p>Real-time monitoring. Scientific documentation. Path to UNESCO World Heritage designation.</p>
+        </div>
+
+        <div class="sites-grid">
+            <div class="site-card">
+                <div class="site-icon">🏞️</div>
+                <div class="site-content">
+                    <div class="site-type">Karst Landscape</div>
+                    <h4 class="site-name">Cockpit Country</h4>
+                    <p class="site-description">Unique cone-shaped limestone formations creating a landscape found nowhere else on Earth. Critical biodiversity hotspot with endemic species.</p>
+                    <div class="site-status">🔍 Geospatial monitoring in progress</div>
+                </div>
+            </div>
+
+            <div class="site-card">
+                <div class="site-icon">✨</div>
+                <div class="site-content">
+                    <div class="site-type">Bioluminescent Ecosystem</div>
+                    <h4 class="site-name">Glistening Waters</h4>
+                    <p class="site-description">One of only a few bioluminescent lagoons worldwide. Unique dinoflagellate ecosystem. Environmental baseline monitoring established.</p>
+                    <div class="site-status">📊 Real-time ecological monitoring</div>
+                </div>
+            </div>
+
+            <div class="site-card">
+                <div class="site-icon">⛰️</div>
+                <div class="site-content">
+                    <div class="site-type">Mountain Wilderness</div>
+                    <h4 class="site-name">Blue Mountains</h4>
+                    <p class="site-description">Jamaica's highest peaks with pristine cloud forest ecosystems. Watershed protection critical for island water supply.</p>
+                    <div class="site-status">🌧️ Hydrological monitoring active</div>
+                </div>
+            </div>
+
+            <div class="site-card">
+                <div class="site-icon">💧</div>
+                <div class="site-content">
+                    <div class="site-type">Freshwater System</div>
+                    <h4 class="site-name">Green Grotto</h4>
+                    <p class="site-description">Pristine cave system with underground freshwater lakes. Critical water resource and archaeological significance.</p>
+                    <div class="site-status">💧 Water quality real-time monitoring</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="monitoring-section">
+        <div class="monitoring-header">
+            <h3>Real-Time Environmental Intelligence</h3>
+            <p>JUICY provides continuous monitoring data that documents the ecological value and vulnerability of Jamaica's natural heritage.</p>
+        </div>
+
+        <div class="monitoring-grid">
+            <div class="metric-card">
+                <div class="metric-number">24/7</div>
+                <div class="metric-label">Continuous Environmental Monitoring</div>
+            </div>
+            <div class="metric-card">
+                <div class="metric-number">8</div>
+                <div class="metric-label">Data Categories (Water, Ecosystem, Climate)</div>
+            </div>
+            <div class="metric-card">
+                <div class="metric-number">∞</div>
+                <div class="metric-label">Scientific Baseline Documentation</div>
+            </div>
+            <div class="metric-card">
+                <div class="metric-number">1</div>
+                <div class="metric-label">Unified Data Platform</div>
+            </div>
+        </div>
+    </section>
+
+    <section class="unesco-section">
+        <div class="unesco-content">
+            <div class="unesco-text">
+                <h3>UNESCO World Heritage Pathway</h3>
+                <p>JUICY provides the scientific documentation and monitoring infrastructure required for UNESCO World Heritage designation. Our data demonstrates ecological significance, uniqueness, and protection mechanisms.</p>
+                <p>By establishing real-time monitoring and comprehensive environmental documentation, Jamaica strengthens its case for protecting these irreplaceable ecosystems at the highest international level.</p>
+                <p><strong>The Goal:</strong> Transform Jamaica from visitor of international conservation frameworks into steward of globally recognized natural heritage.</p>
+            </div>
+            <div class="unesco-visual">🌍</div>
+        </div>
+    </section>
+
+    <footer>
+        <p><strong>JUICY: Jamaica's Environmental Heritage Protection Infrastructure</strong></p>
+        <p>Real-time monitoring • Scientific documentation • UNESCO World Heritage partnership</p>
+        <div class="footer-links">
+            <a href="#">Live Monitoring Dashboard</a>
+            <a href="#">Scientific Data</a>
+            <a href="#">UNESCO Partnership</a>
+            <a href="#">Contact Us</a>
+        </div>
+        <p style="margin-top: 2rem; font-size: 0.85rem; opacity: 0.8;">Luminous.Works LLC | Jamaica Environmental Heritage Initiative</p>
+    </footer>
+</body>
+</html>

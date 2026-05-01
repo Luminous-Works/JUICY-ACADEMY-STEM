@@ -1,0 +1,507 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cockpit Country: Jamaica's Unique Karst Landscape</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --color-stone-dark: #3d3d3d;
+            --color-stone-light: #8b8b7f;
+            --color-limestone-warm: #c9a877;
+            --color-forest-deep: #2d5a3d;
+            --color-accent-earth: #d4a574;
+            --color-accent-emerald: #4a9d6f;
+            --color-light-bg: #f5f0e8;
+            --font-display: 'Georgia', serif;
+            --font-body: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+        }
+
+        body {
+            font-family: var(--font-body);
+            line-height: 1.6;
+            color: #1a1a1a;
+            background: linear-gradient(180deg, var(--color-light-bg) 0%, #e8dcc8 100%);
+        }
+
+        /* HEADER */
+        header {
+            background: linear-gradient(180deg, var(--color-stone-dark) 0%, #2a2a2a 100%);
+            color: white;
+            padding: 1.5rem 2rem;
+            position: fixed;
+            width: 100%;
+            top: 0;
+            z-index: 1000;
+            box-shadow: 0 4px 16px rgba(61, 61, 61, 0.3);
+        }
+
+        header h1 {
+            font-family: var(--font-display);
+            font-size: 1.2rem;
+            font-weight: 700;
+            letter-spacing: -0.5px;
+        }
+
+        header p {
+            font-size: 0.75rem;
+            opacity: 0.85;
+            margin-top: 0.25rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        /* HERO */
+        .hero {
+            margin-top: 70px;
+            position: relative;
+            overflow: hidden;
+            padding: 120px 2rem;
+            text-align: center;
+            background: linear-gradient(135deg, rgba(77, 90, 61, 0.08) 0%, rgba(201, 168, 119, 0.06) 100%);
+        }
+
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background:
+                linear-gradient(135deg, transparent 0%, rgba(77, 90, 61, 0.03) 25%, transparent 50%),
+                linear-gradient(-45deg, transparent 0%, rgba(201, 168, 119, 0.05) 30%, transparent 60%);
+            pointer-events: none;
+            animation: geological 12s ease-in-out infinite;
+        }
+
+        @keyframes geological {
+            0%, 100% { opacity: 0.5; }
+            50% { opacity: 0.8; }
+        }
+
+        .hero-content {
+            position: relative;
+            z-index: 1;
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        .hero h2 {
+            font-family: var(--font-display);
+            font-size: 3.5rem;
+            font-weight: 700;
+            line-height: 1.2;
+            margin-bottom: 1rem;
+            color: var(--color-stone-dark);
+        }
+
+        .hero .subtitle {
+            font-size: 1.4rem;
+            color: var(--color-forest-deep);
+            margin-bottom: 2rem;
+            font-weight: 300;
+        }
+
+        .hero p {
+            font-size: 1.15rem;
+            color: #333;
+            max-width: 700px;
+            margin: 0 auto 2.5rem;
+            line-height: 1.8;
+        }
+
+        /* SIGNIFICANCE SECTION */
+        .significance-section {
+            padding: 80px 2rem;
+            background: white;
+        }
+
+        .significance-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+            gap: 2.5rem;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .sig-card {
+            background: linear-gradient(135deg, #fafaf8 0%, #f0ebe5 100%);
+            padding: 2.5rem 2rem;
+            border-radius: 3px;
+            border-top: 4px solid var(--color-accent-earth);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+            transition: all 0.3s ease;
+        }
+
+        .sig-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 8px 24px rgba(77, 90, 61, 0.15);
+            border-top-color: var(--color-accent-emerald);
+        }
+
+        .sig-icon {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .sig-title {
+            font-family: var(--font-display);
+            font-size: 1.3rem;
+            font-weight: 700;
+            color: var(--color-stone-dark);
+            margin-bottom: 0.75rem;
+        }
+
+        .sig-text {
+            color: #555;
+            font-size: 0.95rem;
+            line-height: 1.6;
+        }
+
+        /* LANDSCAPE SECTION */
+        .landscape-section {
+            padding: 80px 2rem;
+            background: linear-gradient(135deg, var(--color-light-bg) 0%, #ddd5c8 100%);
+        }
+
+        .landscape-content {
+            max-width: 1000px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 4rem;
+            align-items: center;
+        }
+
+        .landscape-text h3 {
+            font-family: var(--font-display);
+            font-size: 2.4rem;
+            color: var(--color-stone-dark);
+            margin-bottom: 1.5rem;
+        }
+
+        .landscape-text p {
+            color: #555;
+            margin-bottom: 1.5rem;
+            line-height: 1.8;
+            font-size: 1.05rem;
+        }
+
+        .landscape-features {
+            list-style: none;
+            margin-bottom: 1.5rem;
+        }
+
+        .landscape-features li {
+            padding-left: 2rem;
+            margin-bottom: 1rem;
+            position: relative;
+            color: #555;
+            line-height: 1.6;
+        }
+
+        .landscape-features li::before {
+            content: '⛰️';
+            position: absolute;
+            left: 0;
+            font-size: 1.2rem;
+        }
+
+        .landscape-visual {
+            background: linear-gradient(135deg, var(--color-stone-dark) 0%, var(--color-forest-deep) 100%);
+            height: 400px;
+            border-radius: 3px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 5rem;
+            box-shadow: 0 12px 40px rgba(61, 61, 61, 0.25);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .landscape-visual::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: radial-gradient(circle at 30% 40%, rgba(201, 168, 119, 0.2) 0%, transparent 50%),
+                        radial-gradient(circle at 70% 70%, rgba(74, 157, 111, 0.15) 0%, transparent 50%);
+            pointer-events: none;
+        }
+
+        /* BIODIVERSITY SECTION */
+        .biodiversity-section {
+            padding: 80px 2rem;
+            background: white;
+        }
+
+        .biodiversity-header {
+            text-align: center;
+            max-width: 800px;
+            margin: 0 auto 4rem;
+        }
+
+        .biodiversity-header h3 {
+            font-family: var(--font-display);
+            font-size: 2.4rem;
+            color: var(--color-stone-dark);
+            margin-bottom: 1rem;
+        }
+
+        .biodiversity-header p {
+            color: #555;
+            font-size: 1.1rem;
+        }
+
+        .biodiversity-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 2rem;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .species-stat {
+            text-align: center;
+            padding: 2rem;
+            background: linear-gradient(135deg, #fafaf8 0%, #f0ebe5 100%);
+            border-radius: 3px;
+            border-left: 4px solid var(--color-accent-emerald);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+        }
+
+        .species-number {
+            font-family: var(--font-display);
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: var(--color-accent-emerald);
+            margin-bottom: 0.5rem;
+        }
+
+        .species-label {
+            color: #555;
+            font-size: 0.95rem;
+            line-height: 1.6;
+        }
+
+        /* PROTECTION SECTION */
+        .protection-section {
+            padding: 80px 2rem;
+            background: linear-gradient(135deg, var(--color-stone-dark) 0%, var(--color-forest-deep) 100%);
+            color: white;
+        }
+
+        .protection-content {
+            max-width: 900px;
+            margin: 0 auto;
+            text-align: center;
+        }
+
+        .protection-content h3 {
+            font-family: var(--font-display);
+            font-size: 2.4rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .protection-content p {
+            font-size: 1.05rem;
+            line-height: 1.8;
+            margin-bottom: 1.5rem;
+            opacity: 0.95;
+        }
+
+        .protection-list {
+            text-align: left;
+            max-width: 600px;
+            margin: 2rem auto;
+            list-style: none;
+        }
+
+        .protection-list li {
+            padding: 1rem 0;
+            padding-left: 2rem;
+            position: relative;
+            font-size: 1rem;
+            line-height: 1.6;
+        }
+
+        .protection-list li::before {
+            content: '✓';
+            position: absolute;
+            left: 0;
+            color: var(--color-accent-earth);
+            font-weight: bold;
+            font-size: 1.2rem;
+        }
+
+        .cta-button {
+            display: inline-block;
+            padding: 14px 32px;
+            background: var(--color-accent-earth);
+            color: white;
+            text-decoration: none;
+            font-weight: 600;
+            border-radius: 3px;
+            margin-top: 1rem;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            border: none;
+        }
+
+        .cta-button:hover {
+            background: #c69566;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(212, 165, 116, 0.3);
+        }
+
+        /* FOOTER */
+        footer {
+            background: #2a2a2a;
+            color: white;
+            padding: 3rem 2rem;
+            text-align: center;
+        }
+
+        footer p {
+            margin-bottom: 0.75rem;
+            font-size: 0.95rem;
+        }
+
+        /* RESPONSIVE */
+        @media (max-width: 768px) {
+            .hero h2 {
+                font-size: 2.2rem;
+            }
+
+            .hero .subtitle {
+                font-size: 1.1rem;
+            }
+
+            .landscape-content {
+                grid-template-columns: 1fr;
+                gap: 2rem;
+            }
+
+            .landscape-visual {
+                height: 300px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Cockpit Country</h1>
+        <p>Jamaica's Unique Karst Landscape</p>
+    </header>
+
+    <div class="hero">
+        <div class="hero-content">
+            <h2>Nature's Geological Masterpiece</h2>
+            <div class="subtitle">A Landscape Found Nowhere Else on Earth</div>
+            <p>Cockpit Country is Jamaica's most distinctive natural wonder—a unique cone-shaped limestone landscape creating a geological formation found nowhere else on Earth, combined with critical biodiversity hotspot status and endemic species found only here.</p>
+        </div>
+    </div>
+
+    <section class="significance-section">
+        <div class="significance-grid">
+            <div class="sig-card">
+                <div class="sig-icon">🏔️</div>
+                <div class="sig-title">Geological Uniqueness</div>
+                <div class="sig-text">Distinctive cone-shaped limestone formations (mogotes) demonstrating karst erosion processes over millions of years—a geological landscape of exceptional global rarity</div>
+            </div>
+
+            <div class="sig-card">
+                <div class="sig-icon">🌿</div>
+                <div class="sig-title">Biodiversity Hotspot</div>
+                <div class="sig-text">Critical habitat for endemic species found nowhere else on Earth, including unique plant communities adapted to limestone terrain and endangered animal species</div>
+            </div>
+
+            <div class="sig-card">
+                <div class="sig-icon">🔬</div>
+                <div class="sig-title">Karst Hydrogeology</div>
+                <div class="sig-text">Complex underground water systems supporting Jamaica's watershed, with limestone aquifers and cave systems of hydrological and ecological importance</div>
+            </div>
+
+            <div class="sig-card">
+                <div class="sig-icon">🗺️</div>
+                <div class="sig-title">Landscape Integrity</div>
+                <div class="sig-text">Largely undisturbed geological and ecological integrity, providing baseline conditions for understanding karst ecosystem development and conservation management</div>
+            </div>
+        </div>
+    </section>
+
+    <section class="landscape-section">
+        <div class="landscape-content">
+            <div class="landscape-text">
+                <h3>A Distinctive Geological Formation</h3>
+                <p>Cockpit Country represents one of the world's most intact and distinctive karst landscapes. The region's characteristic cone-shaped limestone formations (mogotes) create a visual and geological landscape of exceptional uniqueness found nowhere else on Earth.</p>
+                <ul class="landscape-features">
+                    <li><strong>Mogote formations:</strong> Distinctive cone-shaped limestone hills formed by differential erosion over geological timescales</li>
+                    <li><strong>Endemic biodiversity:</strong> Unique plant and animal species adapted exclusively to limestone habitat—found only in Cockpit Country</li>
+                    <li><strong>Underground systems:</strong> Complex cave networks and karst aquifers supporting Jamaica's water resources</li>
+                    <li><strong>Landscape scale:</strong> Approximately 300 square kilometers of continuous karst terrain demonstrating geological processes</li>
+                    <li><strong>Archaeological context:</strong> Historical settlement patterns showing human adaptation to distinctive limestone terrain</li>
+                </ul>
+                <p>JUICY's real-time geospatial monitoring ensures this globally unique landscape is protected while its biodiversity, geological significance, and watershed function are scientifically documented for UNESCO World Heritage inscription.</p>
+            </div>
+            <div class="landscape-visual">🏔️</div>
+        </div>
+    </section>
+
+    <section class="biodiversity-section">
+        <div class="biodiversity-header">
+            <h3>Critical Biodiversity Intelligence</h3>
+            <p>JUICY maintains continuous surveillance of Cockpit Country's ecological systems, documenting species presence, ecosystem health, and habitat conditions essential for international conservation designation.</p>
+        </div>
+
+        <div class="biodiversity-grid">
+            <div class="species-stat">
+                <div class="species-number">100+</div>
+                <div class="species-label">Endemic and near-endemic species found only in Cockpit Country</div>
+            </div>
+            <div class="species-stat">
+                <div class="species-number">Real-time</div>
+                <div class="species-label">Geospatial monitoring and habitat mapping (LiDAR, drone surveys)</div>
+            </div>
+            <div class="species-stat">
+                <div class="species-number">Continuous</div>
+                <div class="species-label">Biodiversity baseline documentation and species presence tracking</div>
+            </div>
+            <div class="species-stat">
+                <div class="species-number">Ongoing</div>
+                <div class="species-label">Karst hydrogeology assessment and aquifer health monitoring</div>
+            </div>
+        </div>
+    </section>
+
+    <section class="protection-section">
+        <div class="protection-content">
+            <h3>UNESCO World Heritage Designation</h3>
+            <p>Cockpit Country meets UNESCO's most stringent criteria for World Heritage protection:</p>
+            <ul class="protection-list">
+                <li>Geological processes demonstrating karst formation over millions of years</li>
+                <li>Unique natural landscape found nowhere else on Earth</li>
+                <li>Critical habitat for endemic species and biodiversity conservation</li>
+                <li>Hydrological importance as Jamaica's primary watershed system</li>
+                <li>Exceptional universal value combining geological, ecological, and hydrological criteria</li>
+            </ul>
+            <p>JUICY's scientific framework transforms Cockpit Country from a locally known landscape into internationally documented and protected heritage. International designation ensures permanent protection for this irreplaceable geological and ecological treasure.</p>
+            <button class="cta-button">Discover JUICY's Conservation Framework</button>
+        </div>
+    </section>
+
+    <footer>
+        <p><strong>Cockpit Country</strong> • Jamaica's Geological Wonder</p>
+        <p>Protected by JUICY: Real-time monitoring • Scientific documentation • UNESCO World Heritage partnership</p>
+        <p style="margin-top: 1.5rem; font-size: 0.85rem; opacity: 0.8;">Luminous.Works LLC | Jamaica Environmental Heritage Initiative</p>
+    </footer>
+</body>
+</html>
