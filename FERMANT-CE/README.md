@@ -33,7 +33,7 @@ computer's letter row.
 | Module | FERMANT surface | The mathematics |
 |---|---|---|
 | **FT-01 · Hearing the Harmonic Series** (live) | MOD-01 · Frey Curve | Fourier series · Σ1/nˢ · convergence you can hear |
-| FT-02 · Conversions (planned) | Keybed · REDSHIFT | frequency ↔ ratio ↔ cents · logarithms |
+| **FT-02 · Conversions** (live) | Keybed · REDSHIFT · ARP strip | frequency ↔ ratio ↔ cents · logarithms · tempo arithmetic |
 | DSP-01 · Envelopes are Functions (planned) | MOD-06 · ADSR | piecewise functions · rates of change |
 | DSP-02 · The Mod Matrix (planned) | MOD-07 · Langlands–Tunnell | periodic functions · scalar multiplication |
 
