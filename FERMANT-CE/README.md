@@ -35,7 +35,7 @@ computer's letter row.
 | **FT-01 · Hearing the Harmonic Series** (live) | MOD-01 · Frey Curve | Fourier series · Σ1/nˢ · convergence you can hear |
 | **FT-02 · Conversions** (live) | Keybed · REDSHIFT · ARP strip | frequency ↔ ratio ↔ cents · logarithms · tempo arithmetic |
 | **DSP-01 · Envelopes are Functions** (live) | MOD-06 · ADSR canvas | piecewise functions · slopes · event-driven pieces · the loop as periodic extension |
-| DSP-02 · The Mod Matrix (planned) | MOD-07 · Langlands–Tunnell | periodic functions · scalar multiplication |
+| **DSP-02 · The Mod Matrix** (live) | MOD-07 · Langlands–Tunnell · MOD-04 | periodic functions · scalar multiplication · sums · rate modulation |
 
 ## The Preset Bank as Problem Set
 
